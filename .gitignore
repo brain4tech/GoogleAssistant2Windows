@@ -1,2 +1,5 @@
 #ignore the .files directory
 .files
+
+#ignore all .txt files
+.txt
