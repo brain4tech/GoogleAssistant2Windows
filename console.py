@@ -4,11 +4,11 @@ import sys
 #from win32 import win32gui, win32console
 import trayicon
 
-
+#trayicon.create()
 
 class console(cmd.Cmd):
     intro = "Dies ist eine Testkonsole für den GoogleAssistant2Windows \n"
-    promt = '(console)'
+    prompt = ''
 
     def do_quit (self, arg):
         log ("Console ist shutting down.")
@@ -17,8 +17,8 @@ class console(cmd.Cmd):
     def do_hide (self, arg):
         log ("Hid the console")
 
-    #def preloop(self):
-        #trayicon.create()
+    def do_shell (self, arg):
+        print (arg)
 
 def log (message):
     print (message)
