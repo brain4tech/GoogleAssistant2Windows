@@ -2,8 +2,8 @@
 import cmd
 import ctypes
 import threading
-
-
+import trayicon
+from sys import exit as exit
 
 
 #Change the title of the console
@@ -15,7 +15,12 @@ class console(cmd.Cmd):
 
     def do_quit (self, arg):
         log ("Console ist shutting down.")
+        print ("going to join")
+        trayicon_thread.join()
+        print ("joined")
+        #exit()
         return True
+
 
     def do_hide (self, arg):
         log ("Hid the console")
@@ -28,5 +33,8 @@ def log (message):
 
 def restore_console ():
     print ("Console Restored")
+
+trayicon_thread = threading.Thread (daemon=True, target=trayicon.create)
+trayicon_thread.start ()
 
 console().cmdloop()
