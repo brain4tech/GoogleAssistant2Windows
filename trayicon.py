@@ -1,7 +1,9 @@
 import pystray
 from PIL import Image, ImageDraw
 
-item = pystray.MenuItem
+
+#import SysTrayIcon by Simon Brunning
+import SysTrayIcon
 
 def restore_console():
     print ("Button clicked")

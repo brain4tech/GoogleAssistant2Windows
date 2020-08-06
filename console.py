@@ -1,10 +1,13 @@
+#Modules for the console
 import cmd
-import sys
-#import win32.lib.win32con as win32con
-#from win32 import win32gui, win32console
-import trayicon
+import ctypes
+import threading
 
-#trayicon.create()
+
+
+
+#Change the title of the console
+ctypes.windll.kernel32.SetConsoleTitleW("GoogleAssistant2Windows Console")
 
 class console(cmd.Cmd):
     intro = "Dies ist eine Testkonsole für den GoogleAssistant2Windows \n"

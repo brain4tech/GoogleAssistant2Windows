@@ -6,3 +6,6 @@
 
 #ignore all cache-files
 *.pyc
+
+#ignore the python cache-folder
+__pychache__
