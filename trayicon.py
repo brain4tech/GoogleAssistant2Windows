@@ -8,10 +8,16 @@ def create ():
     cwd = os.getcwd()
     iconpath = cwd + "\\.files\\GA2W-logo.png"
 
-    trayicon = pystray.Icon('GA2W-Traymenu', create_image(iconpath), menu=pystray.Menu(
-        pystray.MenuItem ('Restore Console', console.restore_console)))
+    global trayicon
 
-    trayicon.run()
+    trayicon = pystray.Icon('GA2W-Traymenu', create_image(iconpath), menu=pystray.Menu(
+        pystray.MenuItem ('Restore Console', console.restore_console  )))
+
+    trayicon.run ()
+
+def stop ():
+    trayicon.stop ()
+
 
 def create_image(imagepath):
     image = Image.open (imagepath)
