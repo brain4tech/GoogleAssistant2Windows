@@ -4,6 +4,7 @@ import ctypes
 import multiprocessing
 import trayicon
 from sys import exit as exit
+import time
 
 kernel32 = ctypes.WinDLL('kernel32')
 user32 = ctypes.WinDLL('user32')
@@ -35,6 +36,11 @@ class console(cmd.Cmd):
     def do_hide (self, arg):
         user32.ShowWindow(hWnd, SW_HIDE)
         log ("Hid the console")
+
+    #def onecmd (self, line):
+        #t = time.localtime()
+        #current_time = time.strftime("%H:%M:%S", t)
+        #print("[" + current_time + "]   " + line)
 
 def log (message):
     print (message)
