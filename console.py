@@ -1,7 +1,7 @@
 #import libraries and modules for console
 import tkinter
 import multiprocessing
-from time import strftime, gmtime
+from time import strftime, gmtime, sleep
 
 #import libraries and modules for trayicon
 import pystray
@@ -29,9 +29,11 @@ def log (message, mprefix=0, userinput=False):
 def process_cmd(event):
     cmd = console_prompt.get()
     console_prompt.delete(0, 'end')
+    log (cmd, 1, True)
     if cmd =="hide":
         hide_console()
-    log (cmd, 1, True)
+    elif cmd=="stop" or "quit":
+        terminate()
 
 def hide_console():
     consoleGUI.withdraw()
@@ -42,6 +44,11 @@ def restore_console ():
     consoleGUI.deiconify()
     delete_trayicon ()
     log ("Console restored", 1)
+
+def terminate():
+    log("Shutting down console", 2)
+    consoleGUI.after (1000, consoleGUI.destroy)
+    #consoleGUI.destroy()
 
 def create_console_GUI ():
     console_font = "Segoe 9"
@@ -93,13 +100,10 @@ def trayicon_create_image(imagepath):
 def main():
 
     #prepare the GUI and the trayicon
-    print ("creating console")
     create_console_GUI()
-    print ("creating trayicon")
     create_trayicon ()
 
     #start the mainloop
-    print ("starting mainloop")
     consoleGUI.mainloop()
 
 
