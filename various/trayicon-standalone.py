@@ -18,7 +18,6 @@ def create ():
 def stop ():
     trayicon.stop ()
 
-
 def create_image(imagepath):
     image = Image.open (imagepath)
     return image
