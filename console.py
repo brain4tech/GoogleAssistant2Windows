@@ -1,6 +1,5 @@
 #import libraries and modules for console
 import tkinter
-import multiprocessing
 from time import strftime, gmtime, sleep
 
 #import libraries and modules for trayicon
@@ -21,19 +20,28 @@ def log (message, mprefix=0, userinput=False):
     else:
         sprefix = ""
 
+    console_output.configure(state='normal')
     if userinput == True:
         console_output.insert ("end", sprefix + "<" + message + ">\n")
     else:
         console_output.insert ("end", sprefix + message + "\n")
+    console_output.configure(state='disabled')
 
 def process_cmd(event):
     cmd = console_prompt.get()
     console_prompt.delete(0, 'end')
+
+    if cmd == "":
+        return
+
     log (cmd, 1, True)
     if cmd =="hide":
         hide_console()
-    elif cmd=="stop" or "quit":
+    elif cmd=="stop" or cmd=="quit":
         terminate()
+    else:
+        log ("Unknown command. Type <help> for more information.", 2)
+        return
 
 def hide_console():
     consoleGUI.withdraw()
@@ -57,17 +65,18 @@ def create_console_GUI ():
     global consoleGUI
     global console_output
     global console_prompt
-    print ("declared global variables")
+    #print ("declared global variables")
 
     consoleGUI = tkinter.Tk()
     consoleGUI.title ("GoogleAssistant2Windows Console")
     consoleGUI.iconbitmap(default=".files\\GA2W-logo.ico")
-    consoleGUI.resizable(True, True)
+    consoleGUI.resizable(False, False)
     consoleGUI.geometry("800x265")
     consoleGUI.configure (bg="white")
 
     console_output = tkinter.Text (consoleGUI, bg="white", height=15, bd=1,
         font=console_font, borderwidth = 1, relief="solid")
+    console_output.configure(state='disabled')
 
     console_prompt = tkinter.Entry (consoleGUI, bd=0, font=console_font, borderwidth = 1, relief="solid")
 
@@ -77,6 +86,11 @@ def create_console_GUI ():
 
     consoleGUI.bind('<Return>', process_cmd)
     consoleGUI.protocol("WM_DELETE_WINDOW", hide_console)
+
+    #consoleGUI.mainloop()
+
+def start_console_GUI():
+    consoleGUI.mainloop()
 
 """ Functions for the trayicon """
 
@@ -105,7 +119,7 @@ def main():
     create_trayicon ()
 
     #start the mainloop
-    consoleGUI.mainloop()
+    start_console_GUI()
 
 
 if __name__ == '__main__':
