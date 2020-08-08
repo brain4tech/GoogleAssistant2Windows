@@ -1,12 +1,15 @@
-#import libraries and modules
+#import libraries and modules for console
 import tkinter
 import multiprocessing
 from time import strftime, gmtime
 
+#import libraries and modules for trayicon
 import pystray
 import os
 from PIL import Image, ImageDraw
 
+
+""" Functions for the console """
 
 def log (message, mprefix=0, userinput=False):
     if mprefix == 1:
@@ -32,12 +35,12 @@ def process_cmd(event):
 
 def hide_console():
     consoleGUI.withdraw()
-    trayicon_create()
+    trayicon.run ()
 
 def restore_console ():
     #print ("console restored")
     consoleGUI.deiconify()
-    trayicon_delete ()
+    delete_trayicon ()
     log ("Console restored", 1)
 
 def create_console_GUI ():
@@ -67,48 +70,37 @@ def create_console_GUI ():
     consoleGUI.bind('<Return>', process_cmd)
     consoleGUI.protocol("WM_DELETE_WINDOW", hide_console)
 
-    #log ("This is a test")
+""" Functions for the trayicon """
 
 def create_trayicon ():
-    global trayicon_process
-    trayicon_process = multiprocessing.Process (target=trayicon.create)
-
-
-def main():
-
-    #global console_output
-
-    #prepare the GUI and the trayicon
-    print ("creating console")
-    create_console_GUI()
-    #print ("creating trayicon")
-    #create_trayicon()
-
-    #start the mainloop and display the trayicon
-    #print ("starting process for trayicon")
-    #trayicon_process.start ()
-    print ("starting mainloop")
-    consoleGUI.mainloop()
-
-
-def trayicon_create ():
 
     cwd = os.getcwd()
     iconpath = cwd + "\\.files\\GA2W-logo.png"
 
     global trayicon
 
-    trayicon = pystray.Icon('GA2W-Traymenu', create_image(iconpath), menu=pystray.Menu(
+    trayicon = pystray.Icon('GA2W-Traymenu', trayicon_create_image(iconpath), menu=pystray.Menu(
         pystray.MenuItem ('Restore Console', restore_console  )))
 
-    trayicon.run ()
-
-def trayicon_delete ():
+def delete_trayicon ():
     trayicon.stop ()
 
-def create_image(imagepath):
+def trayicon_create_image(imagepath):
     image = Image.open (imagepath)
     return image
+
+
+def main():
+
+    #prepare the GUI and the trayicon
+    print ("creating console")
+    create_console_GUI()
+    print ("creating trayicon")
+    create_trayicon ()
+
+    #start the mainloop
+    print ("starting mainloop")
+    consoleGUI.mainloop()
 
 
 if __name__ == '__main__':
