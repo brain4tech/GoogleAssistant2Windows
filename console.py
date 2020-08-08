@@ -22,9 +22,9 @@ def log (message, mprefix=0, userinput=False):
         sprefix = ""
 
     if userinput == True:
-        sprefix = ">>> " + sprefix
-
-    console_output.insert ("end", sprefix + message + "\n")
+        console_output.insert ("end", sprefix + "<" + message + ">\n")
+    else:
+        console_output.insert ("end", sprefix + message + "\n")
 
 def process_cmd(event):
     cmd = console_prompt.get()
@@ -37,6 +37,7 @@ def process_cmd(event):
 
 def hide_console():
     consoleGUI.withdraw()
+    log ("Hid the console", 2)
     trayicon.run ()
 
 def restore_console ():
