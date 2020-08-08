@@ -2,8 +2,10 @@
 import tkinter
 import multiprocessing
 from time import strftime, gmtime
-import trayicon
 
+import pystray
+import os
+from PIL import Image, ImageDraw
 
 
 def log (message, mprefix=0, userinput=False):
@@ -30,13 +32,13 @@ def process_cmd(event):
 
 def hide_console():
     consoleGUI.withdraw()
-    trayicon.create ()
+    trayicon_create()
 
 def restore_console ():
-    #log ("Console restored", 1)
     #print ("console restored")
     consoleGUI.deiconify()
-    trayicon.stop ()
+    trayicon_delete ()
+    log ("Console restored", 1)
 
 def create_console_GUI ():
     console_font = "Segoe 9"
@@ -79,14 +81,35 @@ def main():
     #prepare the GUI and the trayicon
     print ("creating console")
     create_console_GUI()
-    print ("creating trayicon")
-    create_trayicon()
+    #print ("creating trayicon")
+    #create_trayicon()
 
     #start the mainloop and display the trayicon
     #print ("starting process for trayicon")
     #trayicon_process.start ()
     print ("starting mainloop")
     consoleGUI.mainloop()
+
+
+def trayicon_create ():
+
+    cwd = os.getcwd()
+    iconpath = cwd + "\\.files\\GA2W-logo.png"
+
+    global trayicon
+
+    trayicon = pystray.Icon('GA2W-Traymenu', create_image(iconpath), menu=pystray.Menu(
+        pystray.MenuItem ('Restore Console', restore_console  )))
+
+    trayicon.run ()
+
+def trayicon_delete ():
+    trayicon.stop ()
+
+def create_image(imagepath):
+    image = Image.open (imagepath)
+    return image
+
 
 if __name__ == '__main__':
     main()
