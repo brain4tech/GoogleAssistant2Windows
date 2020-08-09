@@ -1,6 +1,7 @@
 #import libraries and modules for console
 import tkinter
-from time import strftime, gmtime, sleep
+from general import  *
+from queue import Queue
 
 #import libraries and modules for trayicon
 import pystray
@@ -10,9 +11,17 @@ from PIL import Image, ImageDraw
 
 """ Functions for the console """
 
-def log (message, mprefix=0, userinput=False):
+q = Queue ()
+
+def log (message, mprefix=0, time=0, userinput=False, guitext=0):
+    if time == 0:
+        time = current_time()
+
+    if guitext == 0:
+        guitext = console_output
+
     if mprefix == 1:
-        sprefix = "[" + strftime("%H:%M:%S", gmtime()) + "]\t"
+        sprefix = "[" + time + "]\t"
     elif mprefix == 2:
         sprefix = ">   "
     elif mprefix == 3:
@@ -20,12 +29,12 @@ def log (message, mprefix=0, userinput=False):
     else:
         sprefix = ""
 
-    console_output.configure(state='normal')
+    guitext.configure(state='normal')
     if userinput == True:
-        console_output.insert ("end", sprefix + "<" + message + ">\n")
+        guitext.insert ("end", sprefix + "<" + message + ">\n")
     else:
-        console_output.insert ("end", sprefix + message + "\n")
-    console_output.configure(state='disabled')
+        guitext.insert ("end", sprefix + message + "\n")
+    guitext.configure(state='disabled')
 
 def process_cmd(event):
     cmd = console_prompt.get()
@@ -34,7 +43,7 @@ def process_cmd(event):
     if cmd == "":
         return
 
-    log (cmd, 1, True)
+    log (cmd, 1, userinput=True)
     if cmd =="hide":
         hide_console()
     elif cmd=="stop" or cmd=="quit":
@@ -77,6 +86,7 @@ def create_console_GUI ():
     console_output = tkinter.Text (consoleGUI, bg="white", height=15, bd=1,
         font=console_font, borderwidth = 1, relief="solid")
     console_output.configure(state='disabled')
+    q.put(console_output)
 
     console_prompt = tkinter.Entry (consoleGUI, bd=0, font=console_font, borderwidth = 1, relief="solid")
 
@@ -116,11 +126,19 @@ def main():
 
     #prepare the GUI and the trayicon
     create_console_GUI()
+    guitext = q.get()
+    q.task_done()
+
     create_trayicon ()
 
     #start the mainloop
     start_console_GUI()
 
 
+
 if __name__ == '__main__':
     main()
+
+    global guitext
+    guitext = q.get()
+    q.task_done()
