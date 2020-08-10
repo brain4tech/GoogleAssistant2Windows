@@ -1,15 +1,14 @@
-#import libraries and modules for console
+#import libraries for console
 import tkinter
 from general import  *
 from queue import Queue
 
-#import libraries and modules for trayicon
+#import libraries for trayicon
 import pystray
 import os
 from PIL import Image, ImageDraw
 
-
-""" Functions for the console """
+""" Console UI """
 
 q = Queue ()
 
@@ -36,6 +35,7 @@ def log (message, mprefix=0, time=0, userinput=False, guitext=0):
         guitext.insert ("end", sprefix + message + "\n")
     guitext.configure(state='disabled')
 
+
 def process_cmd(event):
     cmd = console_prompt.get()
     console_prompt.delete(0, 'end')
@@ -52,10 +52,12 @@ def process_cmd(event):
         log ("Unknown command. Type <help> for more information.", 2)
         return
 
+
 def hide_console():
     consoleGUI.withdraw()
     log ("Hid the console", 2)
     trayicon.run ()
+
 
 def restore_console ():
     #print ("console restored")
@@ -63,18 +65,14 @@ def restore_console ():
     delete_trayicon ()
     log ("Console restored", 1)
 
+
 def terminate():
     log("Shutting down console", 2)
     consoleGUI.after (1000, consoleGUI.destroy)
-    #consoleGUI.destroy()
+
 
 def create_console_GUI ():
     console_font = "Segoe 9"
-
-    global consoleGUI
-    global console_output
-    global console_prompt
-    #print ("declared global variables")
 
     consoleGUI = tkinter.Tk()
     consoleGUI.title ("GoogleAssistant2Windows Console")
@@ -97,12 +95,12 @@ def create_console_GUI ():
     consoleGUI.bind('<Return>', process_cmd)
     consoleGUI.protocol("WM_DELETE_WINDOW", hide_console)
 
-    #consoleGUI.mainloop()
 
 def start_console_GUI():
     consoleGUI.mainloop()
 
-""" Functions for the trayicon """
+
+""" Trayicon """
 
 def create_trayicon ():
 
@@ -114,30 +112,26 @@ def create_trayicon ():
     trayicon = pystray.Icon('GA2W-Traymenu', trayicon_create_image(iconpath), menu=pystray.Menu(
         pystray.MenuItem ('Restore Console', restore_console  )))
 
+
 def delete_trayicon ():
     trayicon.stop ()
+
 
 def trayicon_create_image(imagepath):
     image = Image.open (imagepath)
     return image
 
 
-def main():
-
-    #prepare the GUI and the trayicon
+def run_console():
     create_console_GUI()
-    guitext = q.get()
-    q.task_done()
 
     create_trayicon ()
 
-    #start the mainloop
     start_console_GUI()
 
 
-
 if __name__ == '__main__':
-    main()
+    run_console()
 
     global guitext
     guitext = q.get()
