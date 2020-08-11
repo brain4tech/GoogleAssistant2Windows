@@ -8,71 +8,15 @@ import pystray
 import os
 from PIL import Image, ImageDraw
 
-""" Console UI """
-
 q = Queue ()
 
-def log (message, mprefix=0, time=0, userinput=False, guitext=0):
-    if time == 0:
-        time = current_time()
-
-    if guitext == 0:
-        guitext = console_output
-
-    if mprefix == 1:
-        sprefix = "[" + time + "]\t"
-    elif mprefix == 2:
-        sprefix = ">   "
-    elif mprefix == 3:
-        sprefix = "     "
-    else:
-        sprefix = ""
-
-    guitext.configure(state='normal')
-    if userinput == True:
-        guitext.insert ("end", sprefix + "<" + message + ">\n")
-    else:
-        guitext.insert ("end", sprefix + message + "\n")
-    guitext.configure(state='disabled')
-
-
-def process_cmd(event):
-    cmd = console_prompt.get()
-    console_prompt.delete(0, 'end')
-
-    if cmd == "":
-        return
-
-    log (cmd, 1, userinput=True)
-    if cmd =="hide":
-        hide_console()
-    elif cmd=="stop" or cmd=="quit":
-        terminate()
-    else:
-        log ("Unknown command. Type <help> for more information.", 2)
-        return
-
-
-def hide_console():
-    consoleGUI.withdraw()
-    log ("Hid the console", 2)
-    trayicon.run ()
-
-
-def restore_console ():
-    #print ("console restored")
-    consoleGUI.deiconify()
-    delete_trayicon ()
-    log ("Console restored", 1)
-
-
-def terminate():
-    log("Shutting down console", 2)
-    consoleGUI.after (1000, consoleGUI.destroy)
-
-
+""" Console UI """
 def create_console_GUI ():
     console_font = "Segoe 9"
+
+    global consoleGUI
+    global console_prompt
+    global console_output
 
     consoleGUI = tkinter.Tk()
     consoleGUI.title ("GoogleAssistant2Windows Console")
@@ -98,6 +42,72 @@ def create_console_GUI ():
 
 def start_console_GUI():
     consoleGUI.mainloop()
+
+""" Console functionality """
+
+def log (message, mprefix=0, time=0, userinput=False, guitext=0):
+    if time == 0:
+        time = current_time()
+
+    if guitext == 0:
+        guitext = console_output
+
+    if mprefix == 1:
+        sprefix = "[" + time + "]\t"
+    elif mprefix == 2:
+        sprefix = ">   "
+    elif mprefix == 3:
+        sprefix = "     "
+    else:
+        sprefix = ""
+
+    guitext.configure(state='normal')
+    if userinput == True:
+        guitext.insert ("end", sprefix + "<" + message + ">\n")
+    else:
+        guitext.insert ("end", sprefix + message + "\n")
+    guitext.configure(state='disabled')
+
+def process_cmd(event):
+    cmd = console_prompt.get()
+    console_prompt.delete(0, 'end')
+
+    if cmd == "":
+        return
+
+    log (cmd, 1, userinput=True)
+    if cmd =="hide":
+        hide_console()
+    elif cmd == "stop" or cmd == "quit":
+        terminate()
+    elif cmd == "clear" or cmd == "cls":
+        clear_console()
+    else:
+        log ("Unknown command. Type <help> for more information.", 2)
+        return
+
+def terminate():
+    log("Shutting down console", 2)
+    consoleGUI.after (1000, consoleGUI.destroy)
+
+""" Console appearance """
+
+def hide_console():
+    consoleGUI.withdraw()
+    log ("Hid the console", 2)
+    trayicon.run ()
+
+
+def restore_console ():
+    #print ("console restored")
+    consoleGUI.deiconify()
+    delete_trayicon ()
+    log ("Console restored", 1)
+
+def clear_console ():
+    console_output.configure(state='normal')
+    console_output.delete('1.0', "end")
+    console_output.configure(state='disabled')
 
 
 """ Trayicon """
