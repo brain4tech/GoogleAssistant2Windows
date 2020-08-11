@@ -95,6 +95,7 @@ def terminate():
 def hide_console():
     consoleGUI.withdraw()
     log ("Hid the console", 2)
+    create_trayicon ()
     trayicon.run ()
 
 
@@ -135,7 +136,7 @@ def trayicon_create_image(imagepath):
 def run_console():
     create_console_GUI()
 
-    create_trayicon ()
+    #create_trayicon ()
 
     start_console_GUI()
 
