@@ -2,6 +2,7 @@
 import tkinter
 from general import  *
 from queue import Queue
+import help
 
 #import libraries for trayicon
 import pystray
@@ -68,6 +69,10 @@ def log (message, mprefix=0, time=0, userinput=False, guitext=0):
         guitext.insert ("end", sprefix + message + "\n")
     guitext.configure(state='disabled')
 
+def log_array (array):
+    for x in array:
+        log (x)
+
 def process_cmd(event):
     cmd = console_prompt.get()
     console_prompt.delete(0, 'end')
@@ -76,19 +81,29 @@ def process_cmd(event):
         return
 
     log (cmd, 1, userinput=True)
-    if cmd =="hide":
-        hide_console()
-    elif cmd == "stop" or cmd == "quit":
-        terminate()
-    elif cmd == "clear" or cmd == "cls":
-        clear_console()
-    else:
-        log ("Unknown command. Type <help> for more information.", 2)
-        return
+
+    commands = {
+        "hide":     hide_console,
+        "stop":     terminate,
+        "quit":     terminate,
+        "clear":    clear_console,
+        "cls":      clear_console,
+        "help":     log_main_help,
+        "?":        log_main_help
+    }
+
+    func = commands.get (cmd, unknown_command)
 
 def terminate():
     log("Shutting down console", 2)
     consoleGUI.after (1000, consoleGUI.destroy)
+
+def log_main_help():
+        log_array(help.help_main())
+
+def unknown_command ():
+    log ("Unknown command. Type <help> for more information.", 2)
+    return
 
 """ Console appearance """
 
