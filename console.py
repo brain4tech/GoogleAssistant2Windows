@@ -81,10 +81,14 @@ def process_cmd(event):
     if cmd == "":
         return
 
-    event_log (cmd, "Console", mprefix=1, userinput=True)
+    global nowtime
+    nowtime = current_time()
+
+
+    event_log ("", consolemessage=cmd, module="Console", mprefix=1, userinput=True, time=nowtime)
 
     commands = {
-        "hide":     hide_console,
+        "hide":     hide_console_user,
         "stop":     terminate,
         "quit":     terminate,
         "clear":    clear_console,
@@ -94,40 +98,56 @@ def process_cmd(event):
     }
 
     func = commands.get (cmd, unknown_command)
-    func ()
 
-def terminate():
-    event_log("Shutting down console", "Console", mprefix=2)
-    print ("Shuuting down")
+    if func == unknown_command:
+        event_log("User issued command <" + cmd + ">, which is an unknown command. Ignoring it.", module="Console", time=nowtime)
+        unknown_command()
+    elif func == terminate:
+        terminate (cmd)
+    elif func == clear_console:
+        clear_console(cmd)
+    elif func == log_main_help:
+        log_main_help(cmd)
+    else:
+        func()
+
+def terminate(command):
+    event_log("User issued command <" + command + ">. Shutting down console.", "Shutting down console", module="Console", mprefix=2, time=nowtime)
     consoleGUI.after (1000, consoleGUI.destroy)
-    print ("destroyed console")
 
 def log_main_help():
+    event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
     log_array(help.help_main())
 
 def unknown_command ():
-    event_log ("Unknown command. Type <help> for more information.", "Console", mprefix=2)
+    event_log ("", "Unknown command. Type <help> for more information.", module="Console", mprefix=2, time=nowtime)
     return
 
 """ Console appearance """
 
-def hide_console():
+def hide_console_user():
     consoleGUI.withdraw()
-    event_log ("Hid the console", "Console", mprefix=2)
+    event_log ("User issued command <hide>. Hiding the console.", "Hid the console", module="Console", mprefix=2, time=nowtime)
     create_trayicon ()
     trayicon.run ()
 
+def hide_console():
+    consoleGUI.withdraw()
+    event_log ("User pressed close-button. Hiding the console.", "Hid the console", module="Console", mprefix=2)
+    create_trayicon ()
+    trayicon.run ()
 
 def restore_console ():
     #print ("console restored")
     consoleGUI.deiconify()
     delete_trayicon ()
-    event_log ("Console restored", "Console", mprefix=1)
+    event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
 
-def clear_console ():
+def clear_console (command):
     console_output.configure(state='normal')
     console_output.delete('1.0', "end")
     console_output.configure(state='disabled')
+    event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
 
 
 """ Trayicon """
@@ -167,7 +187,7 @@ def configure_logger ():
     f.write ("--- This is the log-file for the GoogleAssistant2Windows, started on " + date + " at " + time + " ---\n")
     f.close()
 
-def event_log (message, module, level = 1, time = 0, mprefix=0, userinput=False, guitext=0, log_only=False):
+def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, mprefix=0, userinput=False, guitext=0):
 
     if level == 1:
         str_level = "DEBUG"
@@ -185,13 +205,27 @@ def event_log (message, module, level = 1, time = 0, mprefix=0, userinput=False,
     if time == 0:
         time = current_time()
 
-    message_log = "[" + str_level + " " + time + " " + module + "]\t\t" + message + "\n"
-    f = open (path, "a")
-    f.write (message_log)
-    f.close()
 
-    if log_only == False:
-        console_log(message, mprefix, time, userinput, guitext = queue_guitext)
+    if eventmessage != "":
+
+        if userinput != False:
+            final_eventmessage = "User issued command: <" + eventmessage + ">"
+        else:
+            final_eventmessage = eventmessage
+
+        log_message = "[" + str_level + " " + time + "] " + module + ": " + final_eventmessage + "\n"
+        f = open (path, "a")
+        f.write (log_message)
+        f.close ()
+
+    if consolemessage != "":
+
+        if userinput != False:
+            final_consolemessage = "<" + consolemessage + ">"
+        else:
+            final_consolemessage = consolemessage
+
+        console_log(final_consolemessage, mprefix, time, userinput, guitext = queue_guitext)
 
 """ Execution functions """
 
@@ -209,12 +243,12 @@ if __name__ == '__main__':
 
     console_thread = Thread (target= run_console)
     console_thread.start ()
-    event_log ("Started UI-Thread", "Console", log_only=True)
+    event_log ("Started UI-Thread", module = "Console", level=2)
 
     global queue_guitext
     queue_guitext = q_output.get()
     q_output.task_done()
 
-    event_log ("Console output is now accessible.", "Console", log_only=True)
+    event_log ("Console output is now accessible", module = "Console", level=2)
 
     console_thread.join()
