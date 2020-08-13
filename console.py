@@ -47,7 +47,7 @@ def start_console_GUI():
 
 """ Console functionality """
 
-def console_log (message, mprefix=0, time=0, userinput=False, guitext=0):
+def console_log (message, mprefix=0, time=0, guitext=0):
     if time == 0:
         time = current_time()
 
@@ -64,10 +64,7 @@ def console_log (message, mprefix=0, time=0, userinput=False, guitext=0):
         sprefix = ""
 
     guitext.configure(state='normal')
-    if userinput == True:
-        guitext.insert ("end", sprefix + "<" + message + ">\n")
-    else:
-        guitext.insert ("end", sprefix + message + "\n")
+    guitext.insert ("end", sprefix + message + "\n")
     guitext.configure(state='disabled')
 
 def log_array (array):
@@ -225,7 +222,7 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
         else:
             final_consolemessage = consolemessage
 
-        console_log(final_consolemessage, mprefix, time, userinput, guitext = queue_guitext)
+        console_log(final_consolemessage, mprefix, time, guitext = queue_guitext)
 
 """ Execution functions """
 
