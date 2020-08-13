@@ -1,5 +1,5 @@
 #ignore the .files directory
-.files
+.files/*
 
 #ignore all .txt files
 *.txt
@@ -9,3 +9,7 @@
 
 #ignore the python cache-folder
 __pychache__
+
+#add the logo files
+!.files/GA2W-logo.ico
+!.files/GA2W-logo.png
