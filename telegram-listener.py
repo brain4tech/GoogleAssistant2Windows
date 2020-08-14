@@ -1,5 +1,6 @@
 import requests
 import json
+from time import sleep
 
 global OFFSET
 
@@ -24,9 +25,30 @@ def Polling(url):
 
     try:
         update = requests.get (url + "?offset=" + str(OFFSET))
-    except requests.exceptionsConnectionError:
-        print ("ERROR: Connection Error")
+        result = exclude_result(update)
+        OFFSET = result['update_id'] + 1
+        return result
+
+    except requests.exceptions.ConnectionError:
+        #print ("ERROR: Connection Error")
+        return "Connection Error"
 
 
+def exclude_result (dic):
 
-Polling(requestURL)
+    #exclude value of result in dicionary
+    result_array = dic['result']
+
+    #as the returned result is a list, it is neccesssary to pick the first element from the value,
+    #as this constains the needed keys
+    result_dic = result_array[0]
+
+    #return the messsage
+    return result_dic
+
+while True:
+
+    #print ("Polling")
+    return_val = Polling(requestURL)
+    #print ("Return: " + return_val)
+    sleep (1)
