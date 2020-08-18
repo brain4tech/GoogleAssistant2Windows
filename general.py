@@ -16,3 +16,6 @@ def current_date (symbol="-"):
 
 def today ():
     return current_date() + " " + current_time()
+
+
+#2
