@@ -144,16 +144,16 @@ def hide_console():
     trayicon.run ()
 
 def restore_console ():
-    #print ("console restored")
     consoleGUI.deiconify()
     delete_trayicon ()
     evm.event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
 
 def clear_console (command):
+    evm.event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
     console_output.configure(state='normal')
     console_output.delete('1.0', "end")
     console_output.configure(state='disabled')
-    evm.event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
+
 
 
 """ Trayicon """
@@ -202,25 +202,20 @@ if __name__ == '__main__':
     evm.event_log ("Console output is now accessible", module = "Console", level=2)
 
 
-
-    print ("While Loop")
-
     while loop_callback == True:
         fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+
         if fileexists == True:
-            print ("File exists")
             messageData = ["", "", ""]
+
             f = open ("communicationData\\console-ready.txt", "r")
             lines = f.read()
             f.close ()
             os.remove("communicationData\\console-ready.txt")
-            for x in range(3):
-                string = lines[x]
-                #print (string)
-                string.splitlines()
-                print (string[1])
-                messageData[x] = string[0]
+
+            messageData = lines.splitlines()
             console_log(messageData[0], messageData[1], messageData[2], queue_guitext)
+
         elif loop_callback == False:
             break
 

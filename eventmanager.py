@@ -1,16 +1,15 @@
 from general import  *
 import os
+from time import sleep
 
 try:
     os.remove("communicationData\\console.txt")
 except FileNotFoundError:
-    print ("No files found")
     pass
 
 try:
     os.remove("communicationData\\console-ready.txt")
 except FileNotFoundError:
-    print ("No files found")
     pass
 
 def configure_logger ():
@@ -28,7 +27,6 @@ def configure_logger ():
     f.close()
 
 def write_consoleFile (messageArray):
-    print ("Message arrived: " + messageArray[0])
     com_path = "communicationData\\console.txt"
 
     f = open (com_path, "a")
@@ -39,14 +37,14 @@ def write_consoleFile (messageArray):
         else:
             f.write (str(x) + "\n")
     f.close()
-    print ("Closed file and written")
 
     fileexists = os.path.isfile ("communicationData\\console-ready.txt")
     while fileexists == True:
         fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+        #sleep (0.1)
 
-    print ("renaming")
     os.rename (com_path, "communicationData\\console-ready.txt")
+    #sleep (0.1)
 
     #os.remove (com_path)
     #print ("removed")
@@ -98,4 +96,4 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
         f.write (log_message)
         f.close ()
 
-#write_consoleFile(["Test", "Hi", "Okay"])
+write_consoleFile(["Test", "1", "Okay"])
