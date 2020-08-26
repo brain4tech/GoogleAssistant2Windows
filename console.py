@@ -4,11 +4,17 @@ from general import  *
 from queue import Queue
 from threading import Thread
 import help
+import time
+
+import eventmanager as evm
 
 #import libraries for trayicon
 import pystray
 import os
 from PIL import Image, ImageDraw
+
+global loop_callback
+loop_callback = True
 
 q_output = Queue ()
 
@@ -54,6 +60,8 @@ def console_log (message, mprefix=0, time=0, guitext=0):
     if guitext == 0:
         guitext = console_output
 
+    mprefix = int(mprefix)
+
     if mprefix == 1:
         sprefix = "[" + time + "]\t"
     elif mprefix == 2:
@@ -82,7 +90,7 @@ def process_cmd(event):
     nowtime = current_time()
 
 
-    event_log ("", consolemessage=cmd, module="Console", mprefix=1, userinput=True, time=nowtime)
+    evm.event_log ("", consolemessage=cmd, module="Console", mprefix=1, userinput=True, time=nowtime)
 
     commands = {
         "hide":     hide_console_user,
@@ -97,7 +105,7 @@ def process_cmd(event):
     func = commands.get (cmd, unknown_command)
 
     if func == unknown_command:
-        event_log("User issued command <" + cmd + ">, which is an unknown command. Ignoring it.", module="Console", time=nowtime)
+        evm.event_log("User issued command <" + cmd + ">, which is an unknown command. Ignoring it.", module="Console", time=nowtime)
         unknown_command()
     elif func == terminate:
         terminate (cmd)
@@ -109,28 +117,29 @@ def process_cmd(event):
         func()
 
 def terminate(command):
-    event_log("User issued command <" + command + ">. Shutting down console.", "Shutting down console", module="Console", mprefix=2, time=nowtime)
+    evm.event_log("User issued command <" + command + ">. Shutting down console.", "Shutting down console", module="Console", mprefix=2, time=nowtime)
+    loop_callback = False
     consoleGUI.after (1000, consoleGUI.destroy)
 
 def log_main_help():
-    event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
+    evm.event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
     log_array(help.help_main())
 
 def unknown_command ():
-    event_log ("", "Unknown command. Type <help> for more information.", module="Console", mprefix=2, time=nowtime)
+    evm.event_log ("", "Unknown command. Type <help> for more information.", module="Console", mprefix=2, time=nowtime)
     return
 
 """ Console appearance """
 
 def hide_console_user():
     consoleGUI.withdraw()
-    event_log ("User issued command <hide>. Hiding the console.", "Hid the console", module="Console", mprefix=2, time=nowtime)
+    evm.event_log ("User issued command <hide>. Hiding the console.", "Hid the console", module="Console", mprefix=2, time=nowtime)
     create_trayicon ()
     trayicon.run ()
 
 def hide_console():
     consoleGUI.withdraw()
-    event_log ("User pressed close-button. Hiding the console.", "Hid the console", module="Console", mprefix=2)
+    evm.event_log ("User pressed close-button. Hiding the console.", "Hid the console", module="Console", mprefix=2)
     create_trayicon ()
     trayicon.run ()
 
@@ -138,13 +147,13 @@ def restore_console ():
     #print ("console restored")
     consoleGUI.deiconify()
     delete_trayicon ()
-    event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
+    evm.event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
 
 def clear_console (command):
     console_output.configure(state='normal')
     console_output.delete('1.0', "end")
     console_output.configure(state='disabled')
-    event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
+    evm.event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
 
 
 """ Trayicon """
@@ -180,16 +189,39 @@ def run_console():
 
 if __name__ == '__main__':
 
-    configure_logger()
+    evm.configure_logger()
 
     console_thread = Thread (target= run_console)
     console_thread.start ()
-    event_log ("Started UI-Thread", module = "Console", level=2)
+    evm.event_log ("Started UI-Thread", module = "Console", level=2)
 
     global queue_guitext
     queue_guitext = q_output.get()
     q_output.task_done()
 
-    event_log ("Console output is now accessible", module = "Console", level=2)
+    evm.event_log ("Console output is now accessible", module = "Console", level=2)
+
+
+
+    print ("While Loop")
+
+    while loop_callback == True:
+        fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+        if fileexists == True:
+            print ("File exists")
+            messageData = ["", "", ""]
+            f = open ("communicationData\\console-ready.txt", "r")
+            lines = f.read()
+            f.close ()
+            os.remove("communicationData\\console-ready.txt")
+            for x in range(3):
+                string = lines[x]
+                #print (string)
+                string.splitlines()
+                print (string[1])
+                messageData[x] = string[0]
+            console_log(messageData[0], messageData[1], messageData[2], queue_guitext)
+        elif loop_callback == False:
+            break
 
     console_thread.join()
