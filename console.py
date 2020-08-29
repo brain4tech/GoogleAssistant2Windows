@@ -101,6 +101,9 @@ def process_cmd(event):
     console_log("<" + cmd + ">", mprefix=1, time=nowtime)
     evm.event_log ("CONSOLE MESSAGE: <" + cmd + ">", module="Console", time=nowtime)
 
+    cmd_split = cmd.split()
+    cmd = cmd_split[0]
+
     commands = {
         "hide":     hide_console_user,
         "stop":     terminate,
@@ -108,7 +111,9 @@ def process_cmd(event):
         "clear":    clear_console,
         "cls":      clear_console,
         "help":     log_main_help,
-        "?":        log_main_help
+        "?":        log_main_help,
+
+        "send":     sendTelegramMessage
     }
 
     func = commands.get (cmd, unknown_command)
@@ -119,10 +124,11 @@ def process_cmd(event):
     elif func == terminate:
         terminate (cmd)
     elif func == clear_console:
-
         clear_console(cmd)
     elif func == log_main_help:
         log_main_help(cmd)
+    elif func == sendTelegramMessage:
+        sendTelegramMessage(cmd_split)
     else:
         func()
 
@@ -135,6 +141,27 @@ def terminate(command):
 def log_main_help():
     evm.event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
     log_array(help.help_main())
+
+def sendTelegramMessage (input):
+
+    global nowtime
+
+    if len(input) > 1:
+
+        message = ""
+        for x in range (1, len(input)):
+            message = message + input[x] + " "
+        evm.event_log("User issued command <send> with message '" + message +"'. Sending it...", "Sending message '" + message + "' ....", module="Listener", level=2, time=nowtime, mprefix=2)
+        result = tl.sendMessage(message)
+        nowtime = current_time()
+
+        if result == "ConnectionError":
+            evm.event_log("Connection Error. Failed to send the message.", "Failed to send the message. Pleasy try again later.", module="Listener", level=4, time=nowtime, mprefix=2)
+        else:
+            evm.event_log("Message send successfully", "Success!", module="Listener", level=2, time=nowtime, mprefix=2)
+
+    else:
+        evm.event_log("User issued command <send> without a message, ignoring it.", consolemessage= "Error: No message found behind the command.", level=1, mprefix=2, module="Console", time=nowtime)
 
 def unknown_command ():
     console_log("Unknown command. Type <help> for more information.", mprefix=2, time=nowtime)
@@ -227,6 +254,7 @@ def communicationFunc(text):
 
         time.sleep (0.05)
 
+
 if __name__ == '__main__':
 
     #Start the program
@@ -256,7 +284,6 @@ if __name__ == '__main__':
     #evm.event_log("Prepared Listener with "+ botToken + " as Token for the Telegram API", module="Listener", level=2)
 
     #start while-loop and main program
-
     while True:
         result = tl.Polling(botToken)
 
@@ -271,7 +298,6 @@ if __name__ == '__main__':
             if result['channel_post']['chat']['id'] == int(chatID):
 
                 result_text = result['channel_post']['text']
-                print (result_text)
 
                 evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
                 "New incoming commmand: <" + result_text + ">. Analysing ...",
@@ -282,4 +308,4 @@ if __name__ == '__main__':
         if listener_callback == False:
             break
 
-    console_thread.join()
+    #console_thread.join()

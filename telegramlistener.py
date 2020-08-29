@@ -31,7 +31,13 @@ def get_chatID ():
     return chatID
 
 def sendMessage (message):
-    requests.post (url=sendURL + str(message))
+
+    try:
+        requests.post (url=sendURL + str(message))
+        return True
+
+    except requests.exceptions.ConnectionError:
+        return "ConnectionError"
 
 def request(token):
     global OFFSET
@@ -84,7 +90,7 @@ def console_Polling (token, guitext):
     if result == "ConnectionError":
         evm.event_log("Connection Error. Reconnection in 30 Seconds",
         "An error occured (Connection Error). Program will try to reconnect in 30 seconds.",
-        module="LISTENER", time=current_time(), level=3, mprefix=1, guitext=guitext)
+        module="Listener", time=current_time(), level=3, mprefix=1, guitext=guitext)
         time.sleep(30)
     else:
 
@@ -95,7 +101,7 @@ def console_Polling (token, guitext):
 
             evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
             "New incoming commmand: <" + result_text + ">. Analysing ...",
-            module="LISTENER", level=2, mprefix=1, time=current_time(), guitext=guitext)
+            module="Listener", level=2, mprefix=1, time=current_time(), guitext=guitext)
 
             #send to intepreter
 
