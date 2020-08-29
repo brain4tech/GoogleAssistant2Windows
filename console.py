@@ -22,6 +22,9 @@ from PIL import Image, ImageDraw
 global loop_callback
 loop_callback = True
 
+global listener_callback
+listener_callback = True
+
 q_output = Queue ()
 
 """ Console UI """
@@ -125,9 +128,9 @@ def process_cmd(event):
 
 def terminate(command):
     evm.event_log("User issued command <" + command + ">. Shutting down console.", "Shutting down console", module="Console", mprefix=2, time=nowtime)
-    loop_callback = False
+    listener_callback = False
     consoleGUI.after (1000, consoleGUI.destroy)
-    sys.exit("Program terminated")
+    loop_callback = False
 
 def log_main_help():
     evm.event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
@@ -198,6 +201,8 @@ def run_console():
 """ Communication Function """
 
 def communicationFunc(text):
+    global listener_callback
+
     while loop_callback == True:
         fileexists = os.path.isfile ("communicationData\\console-ready.txt")
 
@@ -212,16 +217,15 @@ def communicationFunc(text):
             os.remove("communicationData\\console-ready.txt")
 
             messageData = lines.splitlines()
+
             console_log(messageData[0], messageData[1], messageData[2], text)
 
             if messageData[0] == "Shutting down console":
                 #print ("Stopped Thread")
+                listener_callback = False
                 break
 
         time.sleep (0.05)
-
-""" Telegram Listener Function """
-
 
 if __name__ == '__main__':
 
@@ -239,7 +243,7 @@ if __name__ == '__main__':
     q_output.task_done()
 
     #Start Communication-Thread
-    communication_thread = Thread (target=communicationFunc, args=(queue_guitext, ))
+    communication_thread = Thread (target=communicationFunc, args= (queue_guitext, ))
     communication_thread.start()
     evm.event_log("Started Communication-Thread", module="Console", level=2)
 
@@ -253,7 +257,7 @@ if __name__ == '__main__':
 
     #start while-loop and main program
 
-    while true:
+    while True:
         result = tl.Polling(botToken)
 
         #Handle exceptions before mainloop
@@ -264,7 +268,7 @@ if __name__ == '__main__':
             time.sleep(30)
         else:
 
-            if result['channel_post']['chat']['id'] == chatID:
+            if result['channel_post']['chat']['id'] == int(chatID):
 
                 result_text = result['channel_post']['text']
                 print (result_text)
@@ -274,5 +278,8 @@ if __name__ == '__main__':
                 module="LISTENER", level=2, mprefix=1, time=current_time(), guitext=queue_guitext)
 
                 #send to intepreter
+
+        if listener_callback == False:
+            break
 
     console_thread.join()

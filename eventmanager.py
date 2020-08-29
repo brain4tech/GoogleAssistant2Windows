@@ -65,7 +65,6 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
     if time == 0:
         time = current_time()
 
-
     if eventmessage != "":
 
         if userinput != False:

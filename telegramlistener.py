@@ -2,6 +2,8 @@ import requests
 import json
 from time import sleep
 
+import eventmanager
+
 global OFFSET
 OFFSET = 0
 
@@ -39,7 +41,7 @@ def request(token):
 def Polling (token):
     global OFFSET
 
-    while true:
+    while True:
 
         try:
             update_raw = requests.get ("https://api.telegram.org/bot" + token + "/getUpdates?offset=" + str(OFFSET))
@@ -66,7 +68,7 @@ def exclude_result (dic):
 
 def start ():
     while True:
-        return = Polling (requestURL)
+        result = Polling (requestURL)
 
         if result !=False:
             print ("result")
@@ -74,6 +76,28 @@ def start ():
             print ("Connection Error!")
 
         sleep (1)
+
+def console_Polling (token, guitext):
+    result = Polling(token)
+
+    #Handle exceptions before mainloop
+    if result == "ConnectionError":
+        evm.event_log("Connection Error. Reconnection in 30 Seconds",
+        "An error occured (Connection Error). Program will try to reconnect in 30 seconds.",
+        module="LISTENER", time=current_time(), level=3, mprefix=1, guitext=guitext)
+        time.sleep(30)
+    else:
+
+        if result['channel_post']['chat']['id'] == chatID:
+
+            result_text = result['channel_post']['text']
+            print (result_text)
+
+            evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
+            "New incoming commmand: <" + result_text + ">. Analysing ...",
+            module="LISTENER", level=2, mprefix=1, time=current_time(), guitext=guitext)
+
+            #send to intepreter
 
 if __name__ == '__main__':
     while True:
