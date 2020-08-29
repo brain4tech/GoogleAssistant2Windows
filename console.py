@@ -1,12 +1,18 @@
 #import libraries for console
 import tkinter
-from general import  *
 from queue import Queue
 from threading import Thread
-import help
 import time
+import sys
 
+#modules for requesting
+import requests
+
+#custom modules
+from general import  *
+import help
 import eventmanager as evm
+import telegramlistener as tl
 
 #import libraries for trayicon
 import pystray
@@ -89,8 +95,8 @@ def process_cmd(event):
     global nowtime
     nowtime = current_time()
 
-
-    evm.event_log ("", consolemessage=cmd, module="Console", mprefix=1, userinput=True, time=nowtime)
+    console_log("<" + cmd + ">", mprefix=1, time=nowtime)
+    evm.event_log ("CONSOLE MESSAGE: <" + cmd + ">", module="Console", time=nowtime)
 
     commands = {
         "hide":     hide_console_user,
@@ -110,6 +116,7 @@ def process_cmd(event):
     elif func == terminate:
         terminate (cmd)
     elif func == clear_console:
+
         clear_console(cmd)
     elif func == log_main_help:
         log_main_help(cmd)
@@ -120,13 +127,14 @@ def terminate(command):
     evm.event_log("User issued command <" + command + ">. Shutting down console.", "Shutting down console", module="Console", mprefix=2, time=nowtime)
     loop_callback = False
     consoleGUI.after (1000, consoleGUI.destroy)
+    sys.exit("Program terminated")
 
 def log_main_help():
     evm.event_log("User issued command <" + command + ">. Listing help", module="Console", time=nowtime)
     log_array(help.help_main())
 
 def unknown_command ():
-    evm.event_log ("", "Unknown command. Type <help> for more information.", module="Console", mprefix=2, time=nowtime)
+    console_log("Unknown command. Type <help> for more information.", mprefix=2, time=nowtime)
     return
 
 """ Console appearance """
@@ -144,16 +152,16 @@ def hide_console():
     trayicon.run ()
 
 def restore_console ():
+    #print ("console restored")
     consoleGUI.deiconify()
     delete_trayicon ()
     evm.event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
 
 def clear_console (command):
-    evm.event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
     console_output.configure(state='normal')
     console_output.delete('1.0', "end")
     console_output.configure(state='disabled')
-
+    evm.event_log("User issued command <" + command + ">. Clearing console history.", module="Console", time=nowtime)
 
 
 """ Trayicon """
@@ -187,10 +195,41 @@ def run_console():
     start_console_GUI()
 
 
+""" Communication Function """
+
+def communicationFunc(text):
+    while loop_callback == True:
+        fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+
+        if fileexists == True:
+            messageData = ["", "", ""]
+
+            #print ("a")
+
+            f = open ("communicationData\\console-ready.txt", "r")
+            lines = f.read()
+            f.close ()
+            os.remove("communicationData\\console-ready.txt")
+
+            messageData = lines.splitlines()
+            console_log(messageData[0], messageData[1], messageData[2], text)
+
+            if messageData[0] == "Shutting down console":
+                #print ("Stopped Thread")
+                break
+
+        time.sleep (0.05)
+
+""" Telegram Listener Function """
+
+
 if __name__ == '__main__':
+
+    #Start the program
 
     evm.configure_logger()
 
+    #Start Console-Thread
     console_thread = Thread (target= run_console)
     console_thread.start ()
     evm.event_log ("Started UI-Thread", module = "Console", level=2)
@@ -199,24 +238,41 @@ if __name__ == '__main__':
     queue_guitext = q_output.get()
     q_output.task_done()
 
+    #Start Communication-Thread
+    communication_thread = Thread (target=communicationFunc, args=(queue_guitext, ))
+    communication_thread.start()
+    evm.event_log("Started Communication-Thread", module="Console", level=2)
+
     evm.event_log ("Console output is now accessible", module = "Console", level=2)
 
+    #Prepare Listener Loop
+    botToken = tl.get_botToken()
+    chatID = tl.get_chatID()
 
-    while loop_callback == True:
-        fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+    #evm.event_log("Prepared Listener with "+ botToken + " as Token for the Telegram API", module="Listener", level=2)
 
-        if fileexists == True:
-            messageData = ["", "", ""]
+    #start while-loop and main program
 
-            f = open ("communicationData\\console-ready.txt", "r")
-            lines = f.read()
-            f.close ()
-            os.remove("communicationData\\console-ready.txt")
+    while true:
+        result = tl.Polling(botToken)
 
-            messageData = lines.splitlines()
-            console_log(messageData[0], messageData[1], messageData[2], queue_guitext)
+        #Handle exceptions before mainloop
+        if result == "ConnectionError":
+            evm.event_log("Connection Error. Reconnection in 30 Seconds",
+            "An error occured (Connection Error). Program will try to reconnect in 30 seconds.",
+            module="LISTENER", time=current_time(), level=3, mprefix=1, guitext=queue_guitext)
+            time.sleep(30)
+        else:
 
-        elif loop_callback == False:
-            break
+            if result['channel_post']['chat']['id'] == chatID:
+
+                result_text = result['channel_post']['text']
+                print (result_text)
+
+                evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
+                "New incoming commmand: <" + result_text + ">. Analysing ...",
+                module="LISTENER", level=2, mprefix=1, time=current_time(), guitext=queue_guitext)
+
+                #send to intepreter
 
     console_thread.join()
