@@ -41,10 +41,8 @@ def write_consoleFile (messageArray):
     fileexists = os.path.isfile ("communicationData\\console-ready.txt")
     while fileexists == True:
         fileexists = os.path.isfile ("communicationData\\console-ready.txt")
-        #sleep (0.1)
 
     os.rename (com_path, "communicationData\\console-ready.txt")
-    #sleep (0.1)
 
     #os.remove (com_path)
     #print ("removed")
@@ -91,9 +89,10 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
 
         write_consoleFile(consoleFileData)
 
-        log_message = "[" + str_level + " " + time + "] " + module + ": CONSOLE MESSAGE: " + final_consolemessage + "\n"
-        f = open (path, "a")
-        f.write (log_message)
-        f.close ()
+        if eventmessage == "":
+            log_message = "[" + str_level + " " + time + "] " + module + ": CONSOLE MESSAGE: " + final_consolemessage + "\n"
+            f = open (path, "a")
+            f.write (log_message)
+            f.close ()
 
-write_consoleFile(["Test", "1", "Okay"])
+#write_consoleFile(["Test", "Hi", "Okay"])
