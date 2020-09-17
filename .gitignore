@@ -4,12 +4,9 @@
 #ignore log-directory
 *data/logs
 
+
 #ignore all cache-files
 *.pyc
 
 #ignore the python cache-folder
 __pychache__
-
-#add the logo files
-!.files/GA2W-logo.ico
-!.files/GA2W-logo.png
