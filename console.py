@@ -37,7 +37,7 @@ def create_console_GUI ():
 
     consoleGUI = tkinter.Tk()
     consoleGUI.title ("GoogleAssistant2Windows Console")
-    consoleGUI.iconbitmap(default=".files\\GA2W-logo.ico")
+    consoleGUI.iconbitmap(default="media\\GA2W-logo.ico")
     consoleGUI.resizable(False, False)
     consoleGUI.geometry("800x265")
     consoleGUI.configure (bg="white")
@@ -199,7 +199,7 @@ def clear_console (command):
 def create_trayicon ():
 
     cwd = os.getcwd()
-    iconpath = cwd + "\\.files\\GA2W-logo.png"
+    iconpath = cwd + "\\media\\GA2W-logo.png"
 
     global trayicon
 
@@ -231,17 +231,17 @@ def communicationFunc(text):
     global listener_callback
 
     while loop_callback == True:
-        fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+        fileexists = os.path.isfile ("data\\communication\\console-ready.txt")
 
         if fileexists == True:
             messageData = ["", "", ""]
 
             #print ("a")
 
-            f = open ("communicationData\\console-ready.txt", "r")
+            f = open ("data\\communication\\console-ready.txt", "r")
             lines = f.read()
             f.close ()
-            os.remove("communicationData\\console-ready.txt")
+            os.remove("data\\communication\\console-ready.txt")
 
             messageData = lines.splitlines()
 

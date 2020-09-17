@@ -8,10 +8,10 @@ global OFFSET
 OFFSET = 0
 
 
-botToken_file = open (".files\\botToken.ini", "r")
+botToken_file = open ("data\\botToken.txt", "r")
 botToken = botToken_file.read ()
 
-chatID_file = open (".files\\ChatID.ini", "r")
+chatID_file = open ("data\\ChatID.txt", "r")
 chatID = chatID_file.read ()
 
 global requestURL
@@ -21,12 +21,12 @@ requestURL = "https://api.telegram.org/bot" + botToken + "/getUpdates"
 sendURL = "https://api.telegram.org/bot" + botToken + "/sendMessage?chat_id=" + chatID + "&text="
 
 def get_botToken ():
-    botToken_file = open (".files\\botToken.ini", "r")
+    botToken_file = open ("data\\botToken.txt", "r")
     botToken = botToken_file.read ()
     return botToken
 
 def get_chatID ():
-    chatID_file = open (".files\\ChatID.ini", "r")
+    chatID_file = open ("data\\ChatID.txt", "r")
     chatID = chatID_file.read ()
     return chatID
 
@@ -52,6 +52,7 @@ def Polling (token):
         try:
             update_raw = requests.get ("https://api.telegram.org/bot" + token + "/getUpdates?offset=" + str(OFFSET))
             update = update_raw.json()
+            print (update)
             result = exclude_result(update)
 
             if result != False:
@@ -63,6 +64,9 @@ def Polling (token):
 
 
 def exclude_result (dic):
+
+    if dic["ok"] == False:
+        return False
 
     result_array = dic['result']
 

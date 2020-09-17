@@ -3,12 +3,12 @@ import os
 from time import sleep
 
 try:
-    os.remove("communicationData\\console.txt")
+    os.remove("data\\communication\\console.txt")
 except FileNotFoundError:
     pass
 
 try:
-    os.remove("communicationData\\console-ready.txt")
+    os.remove("data\\communication\\console-ready.txt")
 except FileNotFoundError:
     pass
 
@@ -20,14 +20,14 @@ def configure_logger ():
     time = current_time("-")
 
     programstart = date + "_" + time
-    path = ".files\\logs\\" + programstart + ".log"
+    path = "data\\logs\\" + programstart + ".log"
 
     f = open(path, "a")
     f.write ("--- This is the log-file for the GoogleAssistant2Windows, started on " + date + " at " + time + " ---\n")
     f.close()
 
 def write_consoleFile (messageArray):
-    com_path = "communicationData\\console.txt"
+    com_path = "data\\communication\\console.txt"
 
     f = open (com_path, "a")
 
@@ -38,11 +38,11 @@ def write_consoleFile (messageArray):
             f.write (str(x) + "\n")
     f.close()
 
-    fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+    fileexists = os.path.isfile ("data\\communication\\console-ready.txt")
     while fileexists == True:
-        fileexists = os.path.isfile ("communicationData\\console-ready.txt")
+        fileexists = os.path.isfile ("data\\communication\\console-ready.txt")
 
-    os.rename (com_path, "communicationData\\console-ready.txt")
+    os.rename (com_path, "data\\communication\\console-ready.txt")
 
     #os.remove (com_path)
     #print ("removed")

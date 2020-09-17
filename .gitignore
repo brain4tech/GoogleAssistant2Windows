@@ -1,8 +1,8 @@
-#ignore the .files directory
-.files/*
-
 #ignore all .txt files
 *.txt
+
+#ignore log-directory
+*data/logs
 
 #ignore all cache-files
 *.pyc
