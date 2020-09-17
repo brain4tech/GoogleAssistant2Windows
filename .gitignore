@@ -1,12 +1,13 @@
 #ignore all .txt files
 *.txt
 
-#ignore log-directory
-*data/logs
-
+#ignore log-files
+*.log
 
 #ignore all cache-files
 *.pyc
 
 #ignore the python cache-folder
 __pychache__
+
+!data
