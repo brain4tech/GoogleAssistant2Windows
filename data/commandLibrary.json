@@ -52,5 +52,14 @@
       "test"
     ],
     "callfunc": "_protocol"
-  }
+  },
+  "identifiers": [
+    "open",
+    "close",
+    "lock",
+    "desktop",
+    "wifi",
+    "dark",
+    "protocol"
+  ]
 }
