@@ -19,6 +19,8 @@ import pystray
 import os
 from PIL import Image, ImageDraw
 
+ppath = getParentPath ()
+
 global loop_callback
 loop_callback = True
 
@@ -37,7 +39,7 @@ def create_console_GUI ():
 
     consoleGUI = tkinter.Tk()
     consoleGUI.title ("GoogleAssistant2Windows Console")
-    consoleGUI.iconbitmap(default="media\\GA2W-logo.ico")
+    consoleGUI.iconbitmap(default=ppath / 'media' / 'GA2W-logo.ico')
     consoleGUI.resizable(False, False)
     consoleGUI.geometry("800x265")
     consoleGUI.configure (bg="white")
@@ -182,7 +184,6 @@ def hide_console():
     trayicon.run ()
 
 def restore_console ():
-    #print ("console restored")
     consoleGUI.deiconify()
     delete_trayicon ()
     evm.event_log ("User used trayicon to restore the console. Restoring console.", "Console restored", module="Console", mprefix=1)
@@ -198,8 +199,7 @@ def clear_console (command):
 
 def create_trayicon ():
 
-    cwd = os.getcwd()
-    iconpath = cwd + "\\media\\GA2W-logo.png"
+    iconpath = ppath / 'media' / 'GA2W-logo.ico'
 
     global trayicon
 
@@ -231,17 +231,17 @@ def communicationFunc(text):
     global listener_callback
 
     while loop_callback == True:
-        fileexists = os.path.isfile ("data\\communication\\console-ready.txt")
+        fileexists = os.path.isfile (ppath / 'data' / 'communicatin' / 'console-ready.txt')
 
         if fileexists == True:
             messageData = ["", "", ""]
 
             #print ("a")
 
-            f = open ("data\\communication\\console-ready.txt", "r")
+            f = open (ppath / 'data' / 'communicatin' / 'console-ready.txt', "r")
             lines = f.read()
             f.close ()
-            os.remove("data\\communication\\console-ready.txt")
+            os.remove(ppath / 'data' / 'communicatin' / 'console-ready.txt')
 
             messageData = lines.splitlines()
 

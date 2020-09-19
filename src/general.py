@@ -2,6 +2,8 @@ from time import strftime, gmtime
 
 from datetime import date, datetime
 
+from pathlib import Path
+
 def current_time (symbol=":"):
     now = datetime.now()
     str_now = now.strftime("%H" + symbol + "%M" + symbol + "%S")
@@ -18,4 +20,6 @@ def today ():
     return current_date() + " " + current_time()
 
 
-#
+def getParentPath ():
+    p = Path (__file__).parents[1]
+    return p

@@ -2,16 +2,18 @@ import requests
 import json
 from time import sleep
 
+from general import getParentPath
 import eventmanager
 
 global OFFSET
 OFFSET = 0
 
+ppath = getParentPath ()
 
-botToken_file = open ("data\\botToken.txt", "r")
+botToken_file = open (ppath / 'data' / 'botToken.txt', "r")
 botToken = botToken_file.read ()
 
-chatID_file = open ("data\\ChatID.txt", "r")
+chatID_file = open (ppath / 'data' / 'ChatID.txt', "r")
 chatID = chatID_file.read ()
 
 global requestURL
@@ -21,12 +23,12 @@ requestURL = "https://api.telegram.org/bot" + botToken + "/getUpdates"
 sendURL = "https://api.telegram.org/bot" + botToken + "/sendMessage?chat_id=" + chatID + "&text="
 
 def get_botToken ():
-    botToken_file = open ("data\\botToken.txt", "r")
+    botToken_file = open (ppath / 'data' / 'botToken.txt', "r")
     botToken = botToken_file.read ()
     return botToken
 
 def get_chatID ():
-    chatID_file = open ("data\\ChatID.txt", "r")
+    chatID_file = open (ppath / 'data' / 'ChatID.txt', "r")
     chatID = chatID_file.read ()
     return chatID
 
@@ -52,7 +54,7 @@ def Polling (token):
         try:
             update_raw = requests.get ("https://api.telegram.org/bot" + token + "/getUpdates?offset=" + str(OFFSET))
             update = update_raw.json()
-            print (update)
+            #print (update)
             result = exclude_result(update)
 
             if result != False:
@@ -101,7 +103,7 @@ def console_Polling (token, guitext):
         if result['channel_post']['chat']['id'] == chatID:
 
             result_text = result['channel_post']['text']
-            print (result_text)
+            #print (result_text)
 
             evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
             "New incoming commmand: <" + result_text + ">. Analysing ...",
