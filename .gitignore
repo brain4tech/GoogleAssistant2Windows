@@ -11,3 +11,5 @@
 __pychache__
 
 !data
+
+*.tmp.drivedownload
