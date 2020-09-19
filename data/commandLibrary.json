@@ -1,0 +1,56 @@
+{
+  "open": {
+    "commands": [
+      "öffne",
+      "starte"
+    ],
+    "targets": "False",
+    "callfunc": "_open"
+  },
+  "close": {
+    "commands": [
+      "schließe",
+      "stoppe",
+      "beende"
+    ],
+    "targets": "False",
+    "callfunc": "_close"
+  },
+  "lock": {
+    "commands": [
+      "sperre"
+    ],
+    "targets": "False",
+    "callfunc": "_lock"
+  },
+  "desktop": {
+    "commands": [
+      "desktop"
+    ],
+    "targets": "False",
+    "callfunc": "_desktop"
+  },
+  "wifi": {
+    "commands": [
+      "wlan"
+    ],
+    "targets": "False",
+    "callfunc": "_wifi"
+  },
+  "dark": {
+    "commands": [
+      "dunkelschalten"
+    ],
+    "targets": "False",
+    "callfunc": "_darkScreen"
+  },
+  "protocol": {
+    "commands": [
+      "protokoll"
+    ],
+    "targets": [
+      "test"
+    ],
+    "callfunc": "_protocol"
+  }
+}
