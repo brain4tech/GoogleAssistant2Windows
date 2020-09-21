@@ -3,20 +3,23 @@ from general import getParentPath
 
 ppath = getParentPath ()
 
-f = open (ppath / 'data' / 'commandLibrary.json', "r")
-json_raw = f.read ()
+def getLibrary ():
+    f = open (ppath / 'data' / 'commandLibrary.json', "r")
+    json_raw = f.read ()
+    cmdLibrary = json.loads(json_raw)
 
-cmdLibrary = json.loads(json_raw)
+    return cmdLibrary
+
 
 def getCommands ():
-    identifierlist = cmdLibrary['identifiers']
+    cmdLibrary = getLibrary()
 
-    countCommands = len(identifierlist) -1
+    commandIDlist = list(cmdLibrary.keys())
 
     commandlist = []
 
-    for x in range (len(identifierlist)):
-        commandId = identifierlist[x]
+    for x in range (len(commandIDlist)):
+        commandId = commandIDlist[x]
         commands = cmdLibrary [commandId]['commands']
         for x in range (len(commands)):
             command = commands[x]
@@ -25,6 +28,8 @@ def getCommands ():
     return commandlist
 
 def getTargets (commandId):
+    cmdLibrary = getLibrary()
+
     try:
         targetlist = cmdLibrary[commandId]['targets']
         return targetlist
@@ -32,6 +37,8 @@ def getTargets (commandId):
         pass
 
 def getCallFunc (commandId):
+    cmdLibrary = getLibrary()
+
     try:
         targetlist = cmdLibrary[commandId]['callfunc']
         return targetlist
