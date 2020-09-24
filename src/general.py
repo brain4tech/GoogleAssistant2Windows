@@ -1,7 +1,5 @@
 from time import strftime, gmtime
-
 from datetime import date, datetime
-
 from pathlib import Path
 
 def current_time (symbol=":"):
