@@ -1,11 +1,11 @@
 {
-  "open": {
+  "start": {
     "commands": [
       "öffne",
       "starte"
     ],
     "targets": "False",
-    "callfunc": "_open"
+    "callfunc": "start"
   },
   "close": {
     "commands": [
@@ -14,35 +14,35 @@
       "beende"
     ],
     "targets": "False",
-    "callfunc": "_close"
+    "callfunc": "close"
   },
   "lock": {
     "commands": [
       "sperre"
     ],
     "targets": "False",
-    "callfunc": "_lock"
+    "callfunc": "lock"
   },
   "desktop": {
     "commands": [
       "desktop"
     ],
     "targets": "False",
-    "callfunc": "_desktop"
+    "callfunc": "desktop"
   },
   "wifi": {
     "commands": [
       "wlan"
     ],
     "targets": "False",
-    "callfunc": "_wifi"
+    "callfunc": "wifi"
   },
   "dark": {
     "commands": [
       "dunkelschalten"
     ],
     "targets": "False",
-    "callfunc": "_darkScreen"
+    "callfunc": "darkScreen"
   },
   "protocol": {
     "commands": [
@@ -51,6 +51,6 @@
     "targets": [
       "test"
     ],
-    "callfunc": "_protocol"
+    "callfunc": "protocol"
   }
 }
