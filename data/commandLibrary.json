@@ -4,7 +4,7 @@
       "öffne",
       "starte"
     ],
-    "targets": "False",
+    "targets": "True",
     "callfunc": "start"
   },
   "close": {
@@ -13,7 +13,7 @@
       "stoppe",
       "beende"
     ],
-    "targets": "False",
+    "targets": "True",
     "callfunc": "close"
   },
   "lock": {

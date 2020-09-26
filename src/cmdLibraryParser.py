@@ -4,7 +4,7 @@ from general import getParentPath
 ppath = getParentPath ()
 
 def getLibrary ():
-    f = open (ppath / 'data' / 'commandLibrary.json', "r")
+    f = open (ppath / 'data' / 'commandLibrary.json', "r", encoding='utf8')
     json_raw = f.read ()
     cmdLibrary = json.loads(json_raw)
 
@@ -25,6 +25,7 @@ def getCommands ():
             command = commands[x]
             commandlist.append([commandId, command])
 
+    #print (commandlist)
     return commandlist
 
 def getTargets (commandId):

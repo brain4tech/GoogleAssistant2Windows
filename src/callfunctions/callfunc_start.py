@@ -3,8 +3,6 @@ import os
 import win32api
 import json
 
-ppath = Path (__file__).parents[2]
-
 
 def getGlobalStartmenu ():
 
@@ -20,14 +18,21 @@ def getLocalStartmenu ():
 
     winpath2 = os.environ['APPDATA']
     lnkpath2 = Path (winpath2 + "/Microsoft/Windows/Start Menu/Programs")
+    #print (lnkpath2)
 
     pathlist_raw = list (lnkpath2.glob('**/*.lnk'))
 
     return pathlist_raw
 
 def getOtherApps ():
-    path = ppath / 'src' / 'callFunctions' / 'start_additional-programs.txt'
-    file = open(path, "r")
+
+    print (__file__)
+
+    ppath = Path (__file__).parents[2]
+    #print (ppath)
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_additional-programs.txt')
+    #print (path)
+    file = open(path, "r", encoding='utf8')
     read = file.read()
     otherApps_raw = json.loads(read)
     otherApps = otherApps_raw['programs']
@@ -54,6 +59,8 @@ def optimizePathlist (rawpathlist):
 
     pathlist = []
 
+    substrings = getNoGoStrings()
+
     for x in range (len(rawpathlist)):
 
         strpath_raw = rawpathlist[x]
@@ -63,8 +70,6 @@ def optimizePathlist (rawpathlist):
         #print (lnkfile)
 
         lnkfile = lnkfile.lower()
-
-        substrings = getNoGoStrings()
 
         substringInLinkfile = False
 
@@ -91,9 +96,10 @@ def sortPathlist (pathlist):
     return pathlist
 
 def getNoGoStrings ():
-
-    path = ppath / 'src' / 'callFunctions' / 'start_nogo-substrings.txt'
-    file = open(path, "r")
+    ppath = Path (__file__).parents[2]
+    #print (ppath)
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_nogo-substrings.txt')
+    file = open(path, "r", encoding='utf8')
     strings = file.readlines()
 
     for x in range(len(strings)):
@@ -118,14 +124,7 @@ def comparisonAlgorithm2 (array, input):
     input.split()
 
 
-
-
-def start (input=None):      #open a program or a file
-
-    input = str(input).lower()
-    if input == "" :
-        return
-
+def getPathlist ():
     #get programlist from global startmenu
     globalpathlist_raw = getGlobalStartmenu()
 
@@ -147,8 +146,21 @@ def start (input=None):      #open a program or a file
     #sort the list
     pathlist_sorted = sortPathlist(pathlist)
 
+    return pathlist_sorted
+
+
+def cf_start (input=None):      #open a program or a file
+
+    input = str(input).lower()
+    if input == "" :
+        return
+
+    pathlist = getPathlist()
+
+    print (pathlist)
+
     #check if input is in pathlist
-    result = comparisonAlgorithm1(pathlist_sorted, input)
+    result = comparisonAlgorithm1(pathlist, input)
     #print (result)
 
     if result != False:
@@ -156,5 +168,8 @@ def start (input=None):      #open a program or a file
     else:
         print ("No match found")
 
+
+
+
 if __name__ == '__main__':
-    start("discord")
+    cf_start("")
