@@ -100,4 +100,4 @@ def interpreter (input):
     else:
         analyseTarget(splittedInput, result[0])
 
-interpreter("starte discord")
+interpreter("")

@@ -3,8 +3,6 @@ import os
 import win32api
 import json
 
-ppath = Path (__file__)
-
 
 def getGlobalStartmenu ():
 
@@ -20,7 +18,7 @@ def getLocalStartmenu ():
 
     winpath2 = os.environ['APPDATA']
     lnkpath2 = Path (winpath2 + "/Microsoft/Windows/Start Menu/Programs")
-    print (lnkpath2)
+    #print (lnkpath2)
 
     pathlist_raw = list (lnkpath2.glob('**/*.lnk'))
 
@@ -31,9 +29,9 @@ def getOtherApps ():
     print (__file__)
 
     ppath = Path (__file__).parents[2]
-    print (ppath)
-    path = Path (ppath / 'data' / 'callfunc-files' / 'start_additional-programs.txt')
-    print (path)
+    #print (ppath)
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_additional-programs.txt')
+    #print (path)
     file = open(path, "r", encoding='utf8')
     read = file.read()
     otherApps_raw = json.loads(read)
@@ -100,7 +98,7 @@ def sortPathlist (pathlist):
 def getNoGoStrings ():
     ppath = Path (__file__).parents[2]
     #print (ppath)
-    path = Path (ppath / 'data' / 'callfunc-files' / 'start_nogo-substrings.txt')
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_nogo-substrings.txt')
     file = open(path, "r", encoding='utf8')
     strings = file.readlines()
 
@@ -126,12 +124,7 @@ def comparisonAlgorithm2 (array, input):
     input.split()
 
 
-def cf_start (input=None):      #open a program or a file
-
-    input = str(input).lower()
-    if input == "" :
-        return
-
+def getPathlist ():
     #get programlist from global startmenu
     globalpathlist_raw = getGlobalStartmenu()
 
@@ -150,13 +143,23 @@ def cf_start (input=None):      #open a program or a file
     #merge startmenu and additional programs
     pathlist = mergePathlists (pathlistStartmenu, additional_raw)
 
-    print (pathlist)
-
     #sort the list
     pathlist_sorted = sortPathlist(pathlist)
 
+    return pathlist_sorted
+
+
+def cf_start (input=None):      #open a program or a file
+
+    input = str(input).lower()
+    if input == "" :
+        return
+
+    pathlist = getPathlist()
+    #print (pathlist)
+
     #check if input is in pathlist
-    result = comparisonAlgorithm1(pathlist_sorted, input)
+    result = comparisonAlgorithm1(pathlist, input)
     #print (result)
 
     if result != False:
@@ -165,5 +168,4 @@ def cf_start (input=None):      #open a program or a file
         print ("No match found")
 
 if __name__ == '__main__':
-    ppath = Path (__file__).parents[2]
-    cf_start("powerpoint")
+    cf_start("")

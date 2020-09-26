@@ -11,7 +11,4 @@ def close (input):
 
 def lock (input):
     ctypes.windll.user32.LockWorkStation()
-
-def foo():
-    print ("Hello World")
 #start ("hi")
