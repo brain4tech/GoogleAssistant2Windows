@@ -125,7 +125,7 @@ def comparisonAlgorithm1 (array, input):
 def comparisonAlgorithm2 (array, input):
     input = input.split()
 
-    print (input)
+    #print (input)
 
     summarylist = []
 
@@ -145,7 +145,7 @@ def comparisonAlgorithm2 (array, input):
                 if inputindex in listindex:
 
                     #print (indexsplit)
-                    print ("MATCH: Input <" + inputindex + "> fits to <" + listindex + "> in '" + array[x][0] + "'")
+                    #print ("MATCH: Input <" + inputindex + "> fits to <" + listindex + "> in '" + array[x][0] + "'")
 
                     localcounter = localcounter + 1
 
@@ -157,12 +157,11 @@ def comparisonAlgorithm2 (array, input):
 
     summarylist.sort(reverse=True)
 
-    print (summarylist)
+    #print (summarylist)
 
     result = [array[summarylist[0][1]][0], array[summarylist[0][1]][1]]
 
     return result
-
 
 
 def getPathlist ():
@@ -237,11 +236,19 @@ def cf_start (input=None):      #open a program or a file
     result = comparisonAlgorithm2(pathlist, input)
     #print (result)
 
+    returnvalue = ["Test", "Test"]
+
     if result != False:
-        #win32api.ShellExecute (0, None, result[1], None, None, 1)
-        print ("Match")
+        shellreturn = win32api.ShellExecute (0, None, result[1], None, None, 1)
+        if shellreturn > 32:
+            returnvalue = [True, result[0], result[1]]
+        #print ("Match")
     else:
-        print ("No match found")
+        #print ("No match found")
+        returnvalue = [False, "No match found"]
+
+    #print (returnvalue)
+    return returnvalue
 
 if __name__ == '__main__':
-    cf_start("")
+    cf_start("discord")

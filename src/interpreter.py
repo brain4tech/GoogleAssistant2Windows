@@ -44,12 +44,14 @@ def analyseTarget (input, cmdID):
     print ("Target")
 
 def executeCommand (callfunc, param = None):
-    print (callfunc)
-    print (param)
+    #print (callfunc)
+    #print (param)
 
     function = getattr(callfunctions, callfunc)
 
-    function (param)
+    returnvalue = function (param)
+    print (returnvalue)
+    return returnvalue
 
 def createTargetString (input, index):
     targetstring = ""
@@ -79,25 +81,47 @@ def interpreter (input):
     print ("command: ", result[1])
     print ("index in input: ", result[2])
     print ("command in input: ", result[3])
+    print ("")
 
     needtarget = cmdlp.getTargets(result[0])
-    print (needtarget)
+    #print (needtarget)
 
     if needtarget == "False":
-        print ("False")
+        #print ("False")
 
         callfunc = getCallFunc(result[0])
         executeCommand(callfunc)
 
     elif needtarget == "True":
-        print ("True")
+        #print ("True")
 
         targetstring = createTargetString(splittedInput, result[2])
 
         callfunc = cmdlp.getCallFunc(result[0])
-        executeCommand(callfunc, targetstring)
+        returnvalue = executeCommand(callfunc, targetstring)
+
+        print (returnvalue)
+
+        if returnvalue[0] == True:
+            print ("Execution successfull")
+
+            if len(returnvalue) > 1:
+                print ("Executioninfo:")
+                for x in range (1, len(returnvalue)):
+                    print (returnvalue[x])
+
+        elif returnvalue == False:
+            print ("Execution failed")
+
+            if len(returnvalue) > 1:
+                print ("Executioninfo:")
+                for x in range (1, len(returnvalue)):
+                    print (returnvalue[x])
+
 
     else:
         analyseTarget(splittedInput, result[0])
 
-interpreter("")
+interpreter("öffne")
+#functiontest = callfunctions.start
+#print (functiontest ("test"))
