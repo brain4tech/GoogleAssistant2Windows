@@ -1,8 +1,6 @@
 import ctypes
 from callfunctiondir.callfunc_start import cf_start
 
-global foo
-
 def start(input):
     cf_start(input)
 
