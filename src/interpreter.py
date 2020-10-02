@@ -44,13 +44,12 @@ def analyseTarget (input, cmdID):
     print ("Target")
 
 def executeCommand (callfunc, param = None):
-    #print (callfunc)
-    #print (param)
 
     function = getattr(callfunctions, callfunc)
 
     returnvalue = function (param)
-    print (returnvalue)
+
+    #print (returnvalue)
     return returnvalue
 
 def createTargetString (input, index):
@@ -100,28 +99,28 @@ def interpreter (input):
         callfunc = cmdlp.getCallFunc(result[0])
         returnvalue = executeCommand(callfunc, targetstring)
 
-        print (returnvalue)
+        #print (returnvalue)
 
         if returnvalue[0] == True:
-            print ("Execution successfull")
+            print ("Execution successfull!")
 
             if len(returnvalue) > 1:
                 print ("Executioninfo:")
                 for x in range (1, len(returnvalue)):
-                    print (returnvalue[x])
+                    print ("    >", returnvalue[x])
 
-        elif returnvalue == False:
-            print ("Execution failed")
+        elif returnvalue[0] == False:
+            print ("Execution failed!")
 
             if len(returnvalue) > 1:
                 print ("Executioninfo:")
                 for x in range (1, len(returnvalue)):
-                    print (returnvalue[x])
+                    print ("    >", returnvalue[x])
 
 
     else:
         analyseTarget(splittedInput, result[0])
 
-interpreter("öffne")
+interpreter("öffne sparkasse")
 #functiontest = callfunctions.start
 #print (functiontest ("test"))
