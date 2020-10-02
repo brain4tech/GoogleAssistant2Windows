@@ -131,13 +131,13 @@ def comparisonAlgorithm2 (array, input):
 
     for x in range(len(array)):
 
-        indexsplit =  array[x][0].split()
+        indexsplit = array[x][0].split()
         #print (indexsplit)
 
         localcounter = 0
 
         for y in range (len(input)):
-            for z  in range (len(indexsplit)):
+            for z in range (len(indexsplit)):
 
                 inputindex = input[y]
                 listindex = indexsplit[z]
@@ -251,4 +251,4 @@ def cf_start (input=None):      #open a program or a file
     return returnvalue
 
 if __name__ == '__main__':
-    cf_start("discord")
+    cf_start("bitte word")
