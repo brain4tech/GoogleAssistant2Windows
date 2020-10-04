@@ -16,4 +16,7 @@ def lock (input):
 def pause (input):
     ctypes.windll.user32.keybd_event(0xB3, 0, 0, 0)
 
-#pause ("")
+def blackout (input):
+    ctypes.windll.user32.SendMessageA (65535, 274, 61808, 2)
+
+blackout ("")
