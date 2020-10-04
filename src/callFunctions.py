@@ -13,4 +13,7 @@ def close (input):
 def lock (input):
     ctypes.windll.user32.LockWorkStation()
 
-#start ("hi")
+def pause (input):
+    ctypes.windll.user32.keybd_event(0xB3, 0, 0, 0)
+
+#pause ("")
