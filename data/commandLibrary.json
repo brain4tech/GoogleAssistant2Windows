@@ -42,7 +42,7 @@
       "dunkelschalten"
     ],
     "targets": "False",
-    "callfunc": "darkScreen"
+    "callfunc": "blackout"
   },
   "protocol": {
     "commands": [
