@@ -1,8 +1,14 @@
 import ctypes
 from callfunctiondir.callfunc_start import cf_start
+from callfunctiondir.callfunc_stop import cf_stop
 
 def start(input):
     returnvalue = cf_start(input)
+    #print (returnvalue)
+    return returnvalue
+
+def stop (input):
+    returnvalue = cf_stop(input)
     #print (returnvalue)
     return returnvalue
 
