@@ -93,7 +93,7 @@ def interpreter (input_raw):
 
             #elseif last input index and no other command found,
             #create string starting from last command to end
-            elif x == len(input)-1 and y == len(commandresults)-1:
+            if x == len(input)-1 and y == len(commandresults)-1:
                 for z in range (startindex, len(input)):
                     tempstring = tempstring + " " + input[z]
 
@@ -131,5 +131,23 @@ def interpreter (input_raw):
 
     print (singlecommands)
 
+    for x in range(len(singlecommands)):
+        splitted = singlecommands[x].split()
+        newstring = ""
+        index = -1
+
+        for y in range(len(splitted)):
+            if splitted[y] in "und":
+                index = y
+
+            if y != index:
+                newstring = newstring + " " + splitted[y]
+
+        newstring = newstring.lstrip()
+        singlecommands[x] = newstring
+
+    print (singlecommands)
+
+
 if __name__ == '__main__':
-    interpreter("öffne sparkasse nein word dunkelschalten")
+    interpreter("öffne bitte Sparkasse und Word dunkelschalten")
