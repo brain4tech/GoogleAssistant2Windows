@@ -18,18 +18,16 @@ def getLocalStartmenu ():
 
     winpath2 = os.environ['APPDATA']
     lnkpath2 = Path (winpath2 + "/Microsoft/Windows/Start Menu/Programs")
-    #print (lnkpath2)
 
     pathlist_raw = list (lnkpath2.glob('**/*.lnk'))
 
     return pathlist_raw
 
+
 def getOtherApps ():
 
     ppath = Path (__file__).parents[2]
-    #print (ppath)
     path = Path (ppath / 'data' / 'callfuncfiles' / 'start_additional-programs.txt')
-    #print (path)
     file = open(path, "r", encoding='utf8')
     read = file.read()
     otherApps_raw = json.loads(read)
@@ -37,9 +35,9 @@ def getOtherApps ():
 
     for x in range(len(otherApps)):
         otherApps[x][0] = otherApps[x][0].lower()
-    #print (otherApps)
 
     return otherApps
+
 
 def mergePathlists (list1, list2):
     for x in range (len(list2)):
@@ -47,56 +45,46 @@ def mergePathlists (list1, list2):
 
     return list1
 
+
 def mergeStartwithAdd (list1, list2):
     for x in range (len(list2)):
         list1.append (list2[x])
 
     return list1
 
+
 def optimizePathlist (rawpathlist):
-
     pathlist = []
-
     substrings = getBlacklistStrings()
 
     for x in range (len(rawpathlist)):
-
         strpath_raw = rawpathlist[x]
         strpath = str(strpath_raw)
 
         lnkfile = os.path.basename(strpath)
-        #print (lnkfile)
-
         lnkfile = lnkfile.lower()
 
         substringInLinkfile = False
 
         for x in substrings:
-
             if x in lnkfile:
-
-                #print ("'" + lnkfile + "' got removed because it contained <" + x + ">")
-                #print (strpath)
                 substringInLinkfile = True
 
         if substringInLinkfile != True:
             linkname = lnkfile[:-4]
-            #print (linkname)
             pathlist.append([linkname, strpath])
 
-
     return pathlist
+
 
 def sortPathlist (pathlist):
     pathlist.sort()
 
-    #for x in range (len(pathlist)):
-        #print (pathlist [x][0])
     return pathlist
+
 
 def getBlacklistStrings ():
     ppath = Path (__file__).parents[2]
-    #print (ppath)
     path = Path (ppath / 'data' / 'callfuncfiles' / 'start_blacklist-substrings.txt')
     file = open(path, "r", encoding='utf8')
     strings = file.readlines()
@@ -107,59 +95,60 @@ def getBlacklistStrings ():
     return strings
 
 
+""" #This is the first (older) comparison-algorithm. The second replaced the first one
 def comparisonAlgorithm1 (array, input):
 
     for x in range (len(array)):
-
         if input in array[x][0]:
-            #print ("true")
-            #print (array[x][1])
-
             result = [array[x][0], array[x][1]]
             print (result)
 
             return result
 
-    return False
+    return False    """
 
 def comparisonAlgorithm2 (array, input):
     input = input.split()
-
-    #print (input)
-
     summarylist = []
+    targetsinInput = []
 
     for x in range(len(array)):
-
         indexsplit = array[x][0].split()
-        #print (indexsplit)
-
         localcounter = 0
 
         for y in range (len(input)):
             for z in range (len(indexsplit)):
-
                 inputindex = input[y]
                 listindex = indexsplit[z]
 
                 if inputindex in listindex:
-
-                    #print (indexsplit)
-                    #print ("MATCH: Input <" + inputindex + "> fits to <" + listindex + "> in '" + array[x][0] + "'")
-
                     localcounter = localcounter + 1
 
+                    targetsinInput.append(y)
+
         if localcounter > 0:
-            summarylist.append([localcounter, x, array[x][0]]) #counter, index in array
+            summarylist.append([localcounter, x, array[x][0], targetsinInput]) #counter, index in array
+            targetsinInput = []
 
     if summarylist == []:
         return False
 
     summarylist.sort(reverse=True)
+    result = [array[summarylist[0][1]][0], array[summarylist[0][1]][1], summarylist[0][3]]
 
-    #print (summarylist)
+    delindex = result[2]
+    counter = 0
+    leftstring = ""
 
-    result = [array[summarylist[0][1]][0], array[summarylist[0][1]][1]]
+    for x in delindex:
+        del input[x - counter]
+        counter = counter + 1
+
+    for x in input:
+        leftstring = leftstring + " " + x
+
+    leftstring = leftstring.lstrip()
+    result.append(leftstring)
 
     return result
 
@@ -188,40 +177,39 @@ def getPathlist ():
 
     return pathlist_sorted
 
+
 def checkForProgram (input):
     input = str(input).lower()
     if input == "" :
         return
 
     pathlist = getPathlist()
-    #print (pathlist)
 
     #check if input is in pathlist
     result = comparisonAlgorithm1(pathlist, input)
-    #print (result)
 
     if result != False:
         print ("MATCH! <" +input + "> has a match with:", result[0] + ". Path to program:", result[1])
+
     else:
         print ("ERROR: No match found for <" + input +">")
 
-def printPathlist (index = None):
 
+def printPathlist (index = None):
     array = getPathlist()
 
     if index != None:
-
         try:
-
             print ("Name:", array[index][0])
             print ("Path:", array[index][1])
+
         except Exception as e:
             print ("ERROR", e)
 
     else:
-
         for x in range(len(array)):
             print (array[x][0],"-->", array[x][1])
+
 
 def cf_start (input=None):      #open a program or a file
 
@@ -230,25 +218,22 @@ def cf_start (input=None):      #open a program or a file
         return
 
     pathlist = getPathlist()
-    #print (pathlist)
 
     #check if input is in pathlist
     result = comparisonAlgorithm2(pathlist, input)
-    #print (result)
-
-    returnvalue = ["Test", "Test"]
+    returnvalue = []
 
     if result != False:
         shellreturn = win32api.ShellExecute (0, None, result[1], None, None, 1)
         if shellreturn > 32:
-            returnvalue = [True, result[0], result[1]]
-        #print ("Match")
+            returnvalue = [True, result[0], result[1], result[2], result[3]]
+        else:
+            returnvalue = [False, result[0], result[1], result[2], result[3]]
+
     else:
-        #print ("No match found")
         returnvalue = [False, "No match found"]
 
-    #print (returnvalue)
     return returnvalue
 
 if __name__ == '__main__':
-    cf_start("bitte word")
+    cf_start("affinity photo publisher word powerpoint")
