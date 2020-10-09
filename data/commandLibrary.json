@@ -52,5 +52,12 @@
       "test"
     ],
     "callfunc": "protocol"
+  },
+  "play-pause": {
+    "commands": [
+      "pausier"
+    ],
+    "targets": "False",
+    "callfunc": "pause"
   }
 }
