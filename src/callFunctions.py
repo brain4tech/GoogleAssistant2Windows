@@ -14,12 +14,16 @@ def stop (input): #terminate a running program
 
 def lock (input): #Locks the windows user
     ctypes.windll.user32.LockWorkStation()
+    ctypes.windll.user32.SendMessageA (65535, 274, 61808, 2)
+    return [True, "Workstation successfully locked"]
 
 def pause (input): #pauses/plays the music
     ctypes.windll.user32.keybd_event(0xB3, 0, 0, 0)
+    return [True, "Play/Paused"]
 
 def blackout (input): #blackouts the displays
     ctypes.windll.user32.SendMessageA (65535, 274, 61808, 2)
+    return [True, "Turned off screens successfully"]
 
 def screenon (input): #not implemented yet
     ctypes.windll.user32.SendMessageA (65535, 274, 61808, -1)
