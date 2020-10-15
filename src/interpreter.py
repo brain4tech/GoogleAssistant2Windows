@@ -213,18 +213,16 @@ def interpreter (input_raw):
             printExecutionReturn(returnvalue)
             print ("")
 
-            if returnvalue[4] != "":
-                returnvalue = executeCommand(callfunc, returnvalue[4])
+            if returnvalue[-1] != "":
+                returnvalue = executeCommand(callfunc, returnvalue[-1])
                 printExecutionReturn(returnvalue)
-
 
         else:
             analyseTarget(splittedInput, result[0][0])
             #printExecutionReturn(returnvalue)
 
-
         print ("")
 
 
 if __name__ == '__main__':
-    #interpreter("dunkelschalten")
+    interpreter("schließe word")
