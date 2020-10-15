@@ -107,7 +107,7 @@ def comparisonAlgorithm1 (array, input):
 
     return False    """
 
-def comparisonAlgorithm2 (array, input):
+def comparisonAlgorithm (array, input):
     input = input.split()
     summarylist = []
     targetsinInput = []
@@ -186,7 +186,7 @@ def checkForProgram (input):
     pathlist = getPathlist()
 
     #check if input is in pathlist
-    result = comparisonAlgorithm1(pathlist, input)
+    result = comparisonAlgorithm(pathlist, input)
 
     if result != False:
         print ("MATCH! <" +input + "> has a match with:", result[0] + ". Path to program:", result[1])
@@ -220,7 +220,7 @@ def cf_start (input=None):      #open a program or a file
     pathlist = getPathlist()
 
     #check if input is in pathlist
-    result = comparisonAlgorithm2(pathlist, input)
+    result = comparisonAlgorithm(pathlist, input)
     returnvalue = []
 
     if result != False:
