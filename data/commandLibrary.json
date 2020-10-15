@@ -7,14 +7,14 @@
     "targets": "True",
     "callfunc": "start"
   },
-  "close": {
+  "stop": {
     "commands": [
       "schließe",
       "stoppe",
       "beende"
     ],
     "targets": "True",
-    "callfunc": "close"
+    "callfunc": "stop"
   },
   "lock": {
     "commands": [
