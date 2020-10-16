@@ -1,8 +1,10 @@
+#Import modules
 from general import  *
 import os
 from time import sleep
 from pathlib import Path
 
+#Prepare script for execution
 ppath = getParentPath ()
 
 try:
@@ -15,6 +17,7 @@ try:
 except FileNotFoundError:
     pass
 
+#Configure log-file
 def configure_logger ():
 
     global path
@@ -30,28 +33,8 @@ def configure_logger ():
     f.write ("--- This is the log-file for the GoogleAssistant2Windows, started on " + date + " at " + time + " ---\n")
     f.close()
 
-def write_consoleFile (messageArray):
-    com_path = ppath / 'data' / 'communication' / 'console.txt'
-
-    f = open (com_path, "a")
-
-    for x in messageArray:
-        if x == messageArray[2]:
-            f.write (str(x))
-        else:
-            f.write (str(x) + "\n")
-    f.close()
-
-    fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'console-ready.txt')
-    while fileexists == True:
-        fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'console-ready.txt')
-
-    os.rename (com_path, ppath / 'data' / 'communication' / 'console-ready.txt')
-
-    #os.remove (com_path)
-    #print ("removed")
-
-def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, mprefix=0, userinput=False, guitext=0):
+#Main function to log and handle events within the program
+def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, mprefix=0, userinput=False):
 
     if level == 1:
         str_level = "DEBUG"
@@ -68,13 +51,11 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
 
     if time == 0:
         time = current_time()
+    elif time == "0":
+        time = current_time()
 
     if eventmessage != "":
-
-        if userinput != False:
-            final_eventmessage = "User issued command: <" + eventmessage + ">"
-        else:
-            final_eventmessage = eventmessage
+        final_eventmessage = eventmessage
 
         log_message = "[" + str_level + " " + time + "] " + module + ": " + final_eventmessage + "\n"
         f = open (path, "a")
@@ -98,4 +79,41 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
             f.write (log_message)
             f.close ()
 
-#write_consoleFile(["Test", "Hi", "Okay"])
+#Function to send a message to the console
+def write_consoleFile (messageArray):
+    com_path = ppath / 'data' / 'communication' / 'console.txt'
+
+    f = open (com_path, "a")
+
+    for x in messageArray:
+        if x == messageArray[-1]:
+            f.write (str(x))
+        else:
+            f.write (str(x) + "\n")
+    f.close()
+
+    fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'console-ready.txt')
+    while fileexists == True:
+        fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'console-ready.txt')
+
+    os.rename (com_path, ppath / 'data' / 'communication' / 'console-ready.txt')
+
+
+#Function to send a message to mainloop
+def write_mainFile (messageArray):
+    com_path = ppath / 'data' / 'communication' / 'main.txt'
+
+    f = open (com_path, "a")
+
+    for x in messageArray:
+        if x == messageArray[-1]:
+            f.write (str(x))
+        else:
+            f.write (str(x) + "\n")
+    f.close()
+
+    fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'main-ready.txt')
+    while fileexists == True:
+        fileexists = os.path.isfile (ppath / 'data' / 'communication' / 'main-ready.txt')
+
+    os.rename (com_path, ppath / 'data' / 'communication' / 'main-ready.txt')

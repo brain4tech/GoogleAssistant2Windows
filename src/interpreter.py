@@ -100,7 +100,7 @@ def interpreter (input_raw):
     #Analyse for every command in input
     commandresults = analyseCommand(input)
     if commandresults == False:
-        return
+        return "No command found"
 
     singlecommands = []
     tempstring = ""
@@ -189,7 +189,7 @@ def interpreter (input_raw):
 
         if result == False:
             print ("No command found")
-            return False
+            return "No command found"
 
         commandID = result[0][0]
         print ("commandID: ", commandID)
@@ -222,6 +222,7 @@ def interpreter (input_raw):
             #printExecutionReturn(returnvalue)
 
         print ("")
+
 
 
 if __name__ == '__main__':
