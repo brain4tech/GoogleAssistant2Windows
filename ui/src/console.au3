@@ -1,10 +1,10 @@
-; compiler information for AutoIt
-#AutoIt3Wrapper_AU3Check_Stop_OnWarning=y
-#AutoIt3Wrapper_Icon=..\media\favicon.ico
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Icon=..\..\media\GA2W-logo.ico
 #AutoIt3Wrapper_Res_Description=Console (2020-10-20)
-#AutoIt3Wrapper_Res_Fileversion=0.1
-#AutoIt3Wrapper_UseUpx=n
-#AutoIt3Wrapper_UseX64=y
+#AutoIt3Wrapper_Res_Fileversion=0.1.0.0
+#AutoIt3Wrapper_AU3Check_Stop_OnWarning=y
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+; compiler information for AutoIt
 
 ; opt and just singleton -------------------------------------------------------
 Opt( 'GUIOnEventMode', 1 )   ; Enable OnEvent function notification for the Gui, instead of using GUIGetMsg() (in a while loop).
@@ -28,7 +28,7 @@ If $aInst[0][0] > 1 Then Exit
 
 
 ; declaration ------------------------------------------------------------------
-Global $sPathCommunication    = _PathFull( '..\..\data\communication\' )
+Global $sPathCommunication    = _PathFull( '..\data\communication\' )
 Global $sFilePathConsole      = $sPathCommunication & 'console.txt'
 Global $sFilePathConsoleReady = $sPathCommunication & 'console-ready.txt'
 Global $sFilePathEvm          = $sPathCommunication & 'evm.txt'
