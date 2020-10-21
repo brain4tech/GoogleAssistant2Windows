@@ -4,6 +4,7 @@ from threading import Thread
 import time
 import sys
 import os
+import subprocess
 
 #modules for requesting
 import requests

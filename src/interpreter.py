@@ -92,6 +92,7 @@ def printExecutionReturn (list):
 
 def addToSummaryString(input):
     global summarystring
+    #print (input)
     summarystring = summarystring + input + "\n"
 
 def interpreter (input_raw):
@@ -208,7 +209,6 @@ def interpreter (input_raw):
         needtarget = cmdlp.getTargets(commandID)
 
         if needtarget == "False":
-            print ("")
             callfunc = cmdlp.getCallFunc(commandID)
             returnvalue = executeCommand(callfunc)
             printExecutionReturn(returnvalue)
@@ -218,14 +218,13 @@ def interpreter (input_raw):
             addToSummaryString("targetstring: " + targetstring + "\n")
             callfunc = cmdlp.getCallFunc(commandID)
             returnvalue = executeCommand(callfunc, targetstring)
-
             printExecutionReturn(returnvalue)
-            addToSummaryString("\n")
+            addToSummaryString("")
 
-            if returnvalue[-1] != "":
+            while returnvalue[-1] != "":
                 returnvalue = executeCommand(callfunc, returnvalue[-1])
                 printExecutionReturn(returnvalue)
-                #addToSummaryString("\n")
+                addToSummaryString("")
 
         else:
             #addToSummaryString("\n")
@@ -236,4 +235,4 @@ def interpreter (input_raw):
 
 
 if __name__ == '__main__':
-    print (interpreter("hi"))
+    interpreter("öffne word thunderbird")

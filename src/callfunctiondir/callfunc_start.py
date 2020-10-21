@@ -231,9 +231,10 @@ def cf_start (input=None):      #open a program or a file
             returnvalue = [False, result[0], result[1], result[2], result[3]]
 
     else:
-        returnvalue = [False, "No match found"]
+        returnvalue = [False, "No match found", ""]
 
     return returnvalue
 
 if __name__ == '__main__':
-    cf_start("affinity photo publisher word powerpoint")
+    #print (cf_start("telergamm"))
+    checkForProgram("telegram")
