@@ -20,7 +20,7 @@ ppath = getParentPath ()
 try:
     os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
 except Exception as e:
-    print (e)
+    pass
 
 global listener_callback
 listener_callback = True
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     evm.event_log("Started communicationthread.", module="MAIN", level=2)
 
     #Start console
-    subprocess.Popen(str(ppath / 'ui' / 'console.exe'))
+    subprocess.Popen(str(ppath / 'ui' / 'GA2W Console.exe'))
     evm.event_log("Started console UI.", module = "MAIN", level=2)
 
     #Prepare Listener Loop
