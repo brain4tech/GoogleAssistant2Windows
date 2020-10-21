@@ -12,7 +12,7 @@ Opt( 'MustDeclareVars', 1 )  ; Variables must be pre-declared.
 Opt( 'TrayMenuMode', 1 + 2 ) ; Remove default tray menu for custom tray menu.
 Opt( 'TrayOnEventMode', 1 )  ; Enable OnEvent function notification for the tray menu.
 
-Global $aInst = ProcessList( 'Console.exe' )
+Global $aInst = ProcessList( 'GA2W Console.exe' )
 If $aInst[0][0] > 1 Then Exit
 
 
@@ -35,6 +35,8 @@ Global $sFilePathEvm          = $sPathCommunication & 'evm.txt'
 Global $sFilePathEvmReady     = $sPathCommunication & 'evm-ready.txt'
 Global $sFilePathMain         = $sPathCommunication & 'main.txt'
 Global $sFilePathMainReady    = $sPathCommunication & 'main-ready.txt'
+Global $sFilePathTerminate	  = $sPathCommunication & 'terminate.txt'
+Global $sFilePathInterpreter  = $sPathCommunication & 'interpreter-ready.txt'
 
 Global $hGui, $cEventLog, $cUserInput
 
@@ -54,6 +56,7 @@ Func _cleanupOldData()
     FileDelete( $sFilePathEvmReady )
     FileDelete( $sFilePathMain )
     FileDelete( $sFilePathMainReady )
+	FileDelete ( $sFilePathTerminate )
 EndFunc
 
 Func _createCustomTrayMenu()
@@ -99,6 +102,23 @@ Func _readFileLoop()
 
             _addConsoleLogEntry( $sMessage, $iMode, $sTime )
             FileDelete( $sFilePathConsoleReady )
+        EndIf
+
+		If FileExists( $sFilePathInterpreter ) Then
+            Local $aFileContentList = FileReadToArray( $sFilePathInterpreter )
+            ;_ArrayDisplay( $aFileContentList )
+			Local $iFileReadCount = UBound ($aFileContentList) -1
+
+			If $iFileReadCount == 0 Then
+				_addConsoleLogEntry( $aFileContentList[0], 2, 0 )
+			Else
+				For $i = 0 To $iFileReadCount Step 1
+					_addConsoleLogEntry( $aFileContentList[$i], 3, 0 )
+				Next
+			EndIf
+
+
+            FileDelete( $sFilePathInterpreter )
         EndIf
 
         Sleep( 150 )
@@ -160,6 +180,8 @@ Func _addConsoleLogEntry( $sMessage, $iMode = 0, $sTime = 0 )
             $sMessage = '> ' & $sMessage
         Case 3
             $sMessage = '  ' & $sMessage
+		Case 4
+			$sMessage = '' & $sMessage
     EndSwitch
 
     _GUICtrlEdit_AppendText( $cEventLog, $sMessage & @CRLF )
@@ -180,7 +202,12 @@ Func _executeCommand( $sUserInput )
             ['hide',   '_hideConsole'], _
             ['quit',   '_terminateConsole'], _
             ['stop',   '_terminateConsole'], _
-            ['send',   '_writeMainReadyFile'] _
+            ['send',   '_writeMainReadyFile'], _
+			['m',	   '_writeMainReadyFile'], _
+			['i',	   '_writeMainReadyFile'], _
+			['online', '_writeMainReadyFile'], _
+			['on', '_writeMainReadyFile'], _
+			['om', '_writeMainReadyFile'] _
         ]
 
     Local $aUserInputList    = StringSplit( $sUserInput, ' ' )
@@ -191,17 +218,23 @@ Func _executeCommand( $sUserInput )
         Local $sCommand = $aCommandTable[$i][0]
 
         If $sCommand == $sUserCommand Then
-            If $sCommand == 'send' Then
-                _writeMainReadyFile( $aUserInputList )
 
+			If $sCommand == 'send' Then
+				_writeMainReadyFile( $aUserInputList )
                 Return
-            Else
-                Local $sFunctionName = $aCommandTable[$i][1]
+			ElseIf $sCommand == 'm' OR $sCommand == 'i' Then
+				_writeMainReadyFile( $aUserInputList )
+                Return
+			ElseIf $sCommand == 'online' OR $sCommand == 'on' OR $sCommand == 'om' Then
+				_writeMainReadyFile( $aUserInputList )
+                Return
+			Else
+				Local $sFunctionName = $aCommandTable[$i][1]
                 Call( $sFunctionName )
-
                 Return
-            EndIf
-        EndIf
+			EndIf
+
+		EndIf
     Next
 
     _addConsoleLogEntry( 'Unknown command. Type <help> for more information.', 2 )
@@ -211,13 +244,17 @@ EndFunc
 Func _helpInformation()
     Local $sHelpInformation = _
         '> The following general commands are documented:' & @CRLF & _
-        '  |-- clear, cls              : Clears the console output.' & @CRLF & _
-        '  |-- help, --help, -h, -?, ? : Shows this help information.' & @CRLF & _
-        '  |-- hide                    : Hides the console and creates a tray icon.' & @CRLF & _
-        '  |                             You can restore the console by right-clicking on the tray icon.' & @CRLF & _
-        '  |-- quit, stop              : Shutdown the application.'
+        '  |-- clear, cls		: Clears the console output.' & @CRLF & _
+        '  |-- help, --help, -h, -?, ?	: Shows this help information.' & @CRLF & _
+        '  |-- hide			: Hides the console and creates a tray icon.' & @CRLF & _
+        '  |			  You can restore the console by right-clicking on the tray icon.' & @CRLF & _
+        '  |-- m, --i			: Manually enter a command and send it to the interpreter.' & @CRLF & _
+        '  |			  ["m" --> manually, "i" --> interpreter' & @CRLF & _
+		'  |--online, --on, --om		: Toggle onlinemode [-true (default) or -false]' & @CRLF & _
+        '  |			  Whether the program should be able to receive telegram-messages' & @CRLF & _
+        '  |-- quit, stop		: Shutdown the application.'
 
-    _addConsoleLogEntry( $sHelpInformation )
+    _addConsoleLogEntry( $sHelpInformation , 4)
     _writeEventReadyFile( 'User typed <help>. Showing help text.' )
 EndFunc
 
@@ -233,10 +270,15 @@ Func _hideConsole()
 EndFunc
 
 Func _terminateConsole()
-    _addConsoleLogEntry( 'Shutting down console.', 2 )
-    _writeEventReadyFile( 'User typed <quit>. Shutting down console.', 2 )
+    _writeEventReadyFile( 'User typed <quit>. Program is terminating.', 2 )
+	_addConsoleLogEntry( 'Shutting down background processes ...', 2 )
 
-    Sleep( 500 )
+	_writeFile( $sFilePathTerminate, "")
+
+	_addConsoleLogEntry( 'Terminating console ...', 2 )
+	_addConsoleLogEntry( 'Bye!', 2 )
+
+	Sleep( 500 )
 
     Exit
 EndFunc
