@@ -1,6 +1,7 @@
 import requests
 import json
 from time import sleep
+import os
 
 from general import getParentPath
 import eventmanager
@@ -63,6 +64,12 @@ def Polling (token):
 
         except requests.exceptions.ConnectionError:
             return "ConnectionError"
+
+        fileexists = os.path.isfile(ppath / 'data' / 'communication' / 'terminate.txt')
+
+        if fileexists == True:
+            return False
+
 
 
 def exclude_result (dic):
