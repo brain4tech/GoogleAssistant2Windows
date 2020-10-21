@@ -65,33 +65,38 @@ def createTargetString (input, index):
 
 def printExecutionReturn (list):
     if list == None:
-        print ("An Error occured while gaining and printing the executionresults.")
+        addToSummaryString("An Error occured while gaining and printing the executionresults.")
         return
 
     if list[0] == True:
-        print ("Execution successfull!")
+        addToSummaryString("Execution successfull!")
 
         if len(list) > 1:
-            print ("Executioninfo:")
+            addToSummaryString ("Executioninfo:")
             for x in range (1, len(list)):
                 if list[x] == "":
-                    print ("    >", "Empty")
+                    addToSummaryString ("    > " + "Empty")
                 else:
-                    print ("    >", list[x])
+                    addToSummaryString ("    > " + str(list[x]))
 
     elif list[0] == False:
-        print ("Execution failed!")
+        addToSummaryString ("Execution failed!")
 
         if len(list) > 1:
-            print ("Executioninfo:")
+            addToSummaryString ("Executioninfo:")
             for x in range (1, len(list)):
                 if list[x] == "":
-                    print ("    >", "Empty")
+                    addToSummaryString ("    > " + "Empty")
                 else:
-                    print ("    >", list[x])
+                    addToSummaryString ("    > " + str(list[x]))
 
+def addToSummaryString(input):
+    global summarystring
+    summarystring = summarystring + input + "\n"
 
 def interpreter (input_raw):
+    global summarystring
+    summarystring = ""
 
     #Prepare for algorithm and gain recources
     input = prepareInput(input_raw)
@@ -100,7 +105,8 @@ def interpreter (input_raw):
     #Analyse for every command in input
     commandresults = analyseCommand(input)
     if commandresults == False:
-        return "No command found"
+        addToSummaryString ("No command found")
+        return summarystring
 
     singlecommands = []
     tempstring = ""
@@ -177,8 +183,8 @@ def interpreter (input_raw):
         newstring = newstring.lstrip()
         singlecommands[x] = newstring
 
-    print (singlecommands)
-    print ("")
+    #print (singlecommands)
+    #print ("")
 
     #As the position of the commands is unknown again due to splitting and removing parts of the input,
     #the commands have to be analysed again and executed for every index of singlecommands
@@ -188,42 +194,46 @@ def interpreter (input_raw):
         result = analyseCommand(splittedCommand)
 
         if result == False:
-            print ("No command found")
-            return "No command found"
+            addToSummaryString ("No command found")
+            return summarystring
 
         commandID = result[0][0]
-        print ("commandID: ", commandID)
-        print ("command: ", result[0][1])
-        print ("index in input: ", result[0][2])
-        print ("command in input: ", result[0][3])
+        #print (result)
+
+        addToSummaryString("commandID: " + commandID)
+        addToSummaryString("command: " + result[0][1])
+        addToSummaryString("index in input: " + str(result[0][2]))
+        addToSummaryString("command in input: " + str(result[0][3]))
 
         needtarget = cmdlp.getTargets(commandID)
 
         if needtarget == "False":
+            print ("")
             callfunc = cmdlp.getCallFunc(commandID)
             returnvalue = executeCommand(callfunc)
             printExecutionReturn(returnvalue)
 
         elif needtarget == "True":
             targetstring = createTargetString(splittedCommand, result[0][2])
-            print (targetstring)
+            addToSummaryString("targetstring: " + targetstring + "\n")
             callfunc = cmdlp.getCallFunc(commandID)
             returnvalue = executeCommand(callfunc, targetstring)
 
             printExecutionReturn(returnvalue)
-            print ("")
+            addToSummaryString("\n")
 
             if returnvalue[-1] != "":
                 returnvalue = executeCommand(callfunc, returnvalue[-1])
                 printExecutionReturn(returnvalue)
+                #addToSummaryString("\n")
 
         else:
+            #addToSummaryString("\n")
             analyseTarget(splittedInput, result[0][0])
             #printExecutionReturn(returnvalue)
 
-        print ("")
-
+    return summarystring
 
 
 if __name__ == '__main__':
-    interpreter("schließe word")
+    print (interpreter("hi"))
