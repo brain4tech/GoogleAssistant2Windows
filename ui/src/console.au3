@@ -1,239 +1,277 @@
-#cs ----------------------------------------------------------------------------
+; compiler information for AutoIt
+#AutoIt3Wrapper_AU3Check_Stop_OnWarning=y
+#AutoIt3Wrapper_Icon=..\media\favicon.ico
+#AutoIt3Wrapper_Res_Description=Console (2020-10-20)
+#AutoIt3Wrapper_Res_Fileversion=0.1
+#AutoIt3Wrapper_UseUpx=n
+#AutoIt3Wrapper_UseX64=y
 
- AutoIt Version: 3.3.14.5
- Author:         Brain4Tech
+; opt and just singleton -------------------------------------------------------
+Opt( 'GUIOnEventMode', 1 )   ; Enable OnEvent function notification for the Gui, instead of using GUIGetMsg() (in a while loop).
+Opt( 'MustDeclareVars', 1 )  ; Variables must be pre-declared.
+Opt( 'TrayMenuMode', 1 + 2 ) ; Remove default tray menu for custom tray menu.
+Opt( 'TrayOnEventMode', 1 )  ; Enable OnEvent function notification for the tray menu.
 
- Script Function:
-	Console for GA2W, as GUIs in Python are complete rubbish.
-
-
-#ce ----------------------------------------------------------------------------
-
-; Script Start - Add your code below here
-
-;Start with including some Scripts for the GUI
-	#include <EditConstants.au3>
-	#include <GUIConstantsEx.au3>
-	#include <WindowsConstants.au3>
-	#include <ColorConstants.au3>
-	#include <GuiEdit.au3>
-	#include <Misc.au3>
-	#include <Array.au3>
-
-;Set some optionflags
-	Opt ("GUIOnEventMode", 1) ;Check actions within a GUI with OnEvent, not with While and Switch
-	Opt ("TrayMenuMode", 3) ;Remove the classic tray menu
-	Opt ("TrayOnEventMode", 3) ;Check actions within the trayicon with OnEvent, not with While and Switch
+Global $aInst = ProcessList( 'Console.exe' )
+If $aInst[0][0] > 1 Then Exit
 
 
-_CreateConsoleTrayMenu ()
 
-;Create the GUI and Traymenu
-_CreateConsoleGUI ()
-
-FileChangeDir ("..\..\")
-$filedir = @WorkingDir & "\data\communication\console-ready.txt"
-
-;Delete Files
-FileDelete (@WorkingDir & "\data\communication\console.txt")
-FileDelete (@WorkingDir & "\data\communication\console-ready.txt")
-FileDelete (@WorkingDir & "\data\communication\evm.txt")
-FileDelete (@WorkingDir & "\data\communication\evm-ready.txt")
-FileDelete (@WorkingDir & "\data\communication\main.txt")
-FileDelete (@WorkingDir & "\data\communication\main-ready.txt")
+; includes ---------------------------------------------------------------------
+#include-once
+#include <GUIConstantsEx.au3>
+#include <GuiEdit.au3>
+#include <File.au3>
+#include <String.au3>
+#include <WindowsConstants.au3>
 
 
-Func _CreateConsoleGUI () ;Create the console GUI
 
-	Global $hMain = GUICreate("GoogleAssistant2Windows Console", 800, 300, 200, 120, BitOR ($WS_SYSMENU, $WS_MINIMIZEBOX))
-	 GUISetOnEvent ($GUI_EVENT_CLOSE, "_HideConsoleGUI")
-	 GUISetOnEvent ($GUI_EVENT_MINIMIZE, "_MinimizeConsole")
-	 GUISetBkColor ($COLOR_WHITE)
+; declaration ------------------------------------------------------------------
+Global $sPathCommunication    = _PathFull( '..\..\data\communication\' )
+Global $sFilePathConsole      = $sPathCommunication & 'console.txt'
+Global $sFilePathConsoleReady = $sPathCommunication & 'console-ready.txt'
+Global $sFilePathEvm          = $sPathCommunication & 'evm.txt'
+Global $sFilePathEvmReady     = $sPathCommunication & 'evm-ready.txt'
+Global $sFilePathMain         = $sPathCommunication & 'main.txt'
+Global $sFilePathMainReady    = $sPathCommunication & 'main-ready.txt'
 
-	Global $iEdit = GUICtrlCreateEdit("", 8, 8, 777, 230, BitOR($ES_READONLY, $ES_WANTRETURN, $ES_AUTOVSCROLL, $WS_VSCROLL))
-	 GUICtrlSetBkColor (-1, $COLOR_WHITE)
+Global $hGui, $cEventLog, $cUserInput
 
-	Global $iInput = GUICtrlCreateInput("", 8, 245, 777, 20, $ES_WANTRETURN)
-	 GUICtrlSetOnEvent (-1, "_SendInput")
-	 GUICtrlSetState (-1, $GUI_FOCUS)
 
-	GUISetState(@SW_SHOW, $hMain)
 
+; processing -------------------------------------------------------------------
+_cleanupOldData()
+_createCustomTrayMenu()
+_createGui()
+_setGuiEvents()
+_readFileLoop()
+
+Func _cleanupOldData()
+    FileDelete( $sFilePathConsole )
+    FileDelete( $sFilePathConsoleReady )
+    FileDelete( $sFilePathEvm )
+    FileDelete( $sFilePathEvmReady )
+    FileDelete( $sFilePathMain )
+    FileDelete( $sFilePathMainReady )
 EndFunc
 
-Func _SendInput ()
-	$input = GUICtrlRead ($iInput)
-	GUICtrlSetData ($iInput, "")
+Func _createCustomTrayMenu()
+    Local $cTrayItem = TrayCreateItem( 'Restore console' )
+    TrayItemSetOnEvent( $cTrayItem, '_restoreConsole' )
 
-	If $input = "" Then
-		Return
-	Else
-		_SendEMMessage ("CONSOLE MESSAGE: <" & $input & ">")
-		_ProcessCmd($input)
-	EndIf
-
+    Local Const $iHideTrayIcon = 2
+    TraySetState( $iHideTrayIcon )
 EndFunc
 
-Func _HideConsoleGUI ()
-	TraySetState (1)
-	GUISetState (@SW_HIDE)
-	_SendEMMessage ("User pressed closebutton of UI. Hiding the console.")
-	_ConsoleLog ("Hid the console.", 1)
+Func _createGui()
+    Local $iGuiWidth     = 900
+    Local $iGuiHeight    = 400
+    Local $iGuiXPosition = Default
+    Local $iGuiYPosition = Default
+
+    $hGui       = GUICreate( 'GoogleAssistant2Windows Console', $iGuiWidth, $iGuiHeight, $iGuiXPosition, $iGuiYPosition, BitOR( $WS_SYSMENU, $WS_MINIMIZEBOX ) )
+    $cEventLog  = GUICtrlCreateEdit( '', 10, 10, $iGuiWidth - 25, $iGuiHeight -70, BitOR( $ES_READONLY, $ES_WANTRETURN, $ES_AUTOVSCROLL, $WS_VSCROLL ) )
+    $cUserInput = GUICtrlCreateInput( '', 10, $iGuiHeight - 55, $iGuiWidth - 25, 20, $ES_WANTRETURN )
+
+    GUICtrlSetBkColor( $cEventLog, 0xFFFFFF )
+    ;GUICtrlSetFont( $cEventLog, 9, Default, Default, 'Consolas' )
+    ;GUICtrlSetFont( $cUserInput, 9)
+    GUICtrlSetState( $cUserInput, $GUI_FOCUS )
+
+    GUISetState( @SW_SHOW, $hGui )
 EndFunc
 
-Func _HideConsole ()
-	TraySetState (1)
-	GUISetState (@SW_HIDE)
-	_SendEMMessage ("User issued command <hide>. Hiding the console.")
-	_ConsoleLog ("Hid the console.", 2)
+Func _setGuiEvents()
+    GUISetOnEvent( $GUI_EVENT_MINIMIZE, '_minimizeConsole', $hGui )
+    GUISetOnEvent( $GUI_EVENT_CLOSE, '_closeConsole', $hGui )
+    GUICtrlSetOnEvent( $cUserInput, '_processUserInput' )
 EndFunc
 
-Func _MinimizeConsole () ;Minimize GUI
-	GUISetState(@SW_MINIMIZE, $hMain)
+Func _readFileLoop()
+    While 1
+        If FileExists( $sFilePathConsoleReady ) Then
+            Local $aFileContentList = FileReadToArray( $sFilePathConsoleReady )
+            ;_ArrayDisplay( $aFileContentList )
+            Local $sMessage         = $aFileContentList[0]
+            Local $iMode            = $aFileContentList[1]
+            Local $sTime            = $aFileContentList[2]
+
+            _addConsoleLogEntry( $sMessage, $iMode, $sTime )
+            FileDelete( $sFilePathConsoleReady )
+        EndIf
+
+        Sleep( 150 )
+    WEnd
 EndFunc
 
-Func _RestoreConsole () ;Restore GUI
-	TraySetState (2)
-	GUISetState (@SW_SHOW)
-	_SendEMMessage ("User used trayicon to restore the console. Restoring console.")
-	_ConsoleLog ("Console restored", 1)
+Func _minimizeConsole()
+    GUISetState( @SW_MINIMIZE, $hGui )
 EndFunc
 
-Func _ConsoleLog ($message, $mprefix=0, $time = 0)
-	If $time = 0 Then
-		$time = @HOUR & ":" & @MIN & ":" & @SEC
-	EndIf
-
-	If $mprefix = 1 Then
-		$sprefix = "[" & $time & "] "
-	ElseIf $mprefix = 2 Then
-		$sprefix = ">   "
-	ElseIf $mprefix = 3 Then
-		$sprefix = "     "
-	Else
-		$sprefix = ""
-	EndIf
-
-	_GUICtrlEdit_AppendText ($iEdit, $sprefix & $message & @CRLF)
-
+Func _closeConsole()
+    _addConsoleLogEntry( 'Hide the console.', 1 )
+    _writeEventReadyFile( 'User pressed close button. Hiding the console.' )
+    _showTrayIconHideGui()
 EndFunc
 
-Func _ConsoleLogArray ($array)
-	For $i = 0 To UBound ($array) -1
-		_ConsoleLog ($array[$i])
-	Next
+Func _processUserInput()
+    Local $sUserInput = StringLower( GUICtrlRead( $cUserInput ) )
 
+    If $sUserInput == '' Then
+        Return
+    EndIf
+
+    GUICtrlSetData( $cUserInput, '' )
+
+    _writeEventReadyFile( 'Console message: <' & $sUserInput & '>' )
+    _executeCommand( $sUserInput )
 EndFunc
 
-Func _ProcessCmd ($command)
+Func _hideTrayIconShowGui()
+    Local Const $iHideTrayIcon = 2
+    TraySetState( $iHideTrayIcon )
 
-	_ConsoleLog ("<" & $command & ">", 1)
-
-	$command_split  =  StringSplit ($command, " ")
-	$cmd = $command_split[1]
-
-	Local $commandList = [["hide", "_HideConsole"], ["stop", "_Terminate"], ["quit", "_Terminate"], ["clear", "_ClearConsole"], ["cls", "_ClearConsole"], ["help", "_LogHelp"], ["?", "_LogHelp"], ["send", "_SendTMessage"]]
-
-	$function = ""
-
-	For $i = 0 To UBound($commandList)-1
-		If $commandList[$i][0] = $cmd Then
-
-			$function = $commandList [$i][1]
-		EndIf
-	Next
-
-	If $function <> "" Then
-		If $cmd = "send" Then
-			_SendTMessage ($command_split)
-		Else
-			Call ($function)
-		EndIf
-
-	Else
-		_ConsoleLog ("Unknown command. Type <help> for more information.", 2)
-		_SendEMMessage ("User issued command <" & $cmd & ">, which is an unknown command. Ignoring it.")
-	EndIf
-
-
+    GUISetState( @SW_SHOW, $hGui )
 EndFunc
 
-Func _Terminate ()
-	_ConsoleLog ("Shutting down console", 2)
-	_SendEMMessage ("User issued command <quit>. Shutting down console.", 2)
-	Sleep(1000)
-	Exit
+Func _showTrayIconHideGui()
+    Local Const $iShowTrayIcon = 1
+    TraySetState( $iShowTrayIcon )
+
+    GUISetState( @SW_HIDE, $hGui )
 EndFunc
 
-Func _ClearConsole ()
-	GUICtrlSetData ($iEdit, "")
-	_SendEMMessage ("User issued command <clear>. Clearing Console.")
+Func _restoreConsole()
+    _addConsoleLogEntry( 'Console restored.', 1 )
+    _writeEventReadyFile( 'User used tray icon to restore the console. Restoring console.' )
+    _hideTrayIconShowGui()
 EndFunc
 
-Func _LogHelp ()
+Func _addConsoleLogEntry( $sMessage, $iMode = 0, $sTime = 0 )
+    If $sTime == 0 Then
+        $sTime = @HOUR & ':' & @MIN & ':' & @SEC
+    EndIf
 
-	Local $helptext = [">   The following general commands are documented:", _
-        "  quit	Shuts down the application", _
-        "  hide	Hides the console and creates a trayicon." & @CRLF & "	You can restore the console by right-clicking on this trayicon.", _
-        "  clear	Clears the console output"]
+    Switch $iMode
+        Case 1
+            $sMessage = _StringRepeat( '-', 100 ) & @CRLF & '[' & $sTime & '] ' & $sMessage
+        Case 2
+            $sMessage = '> ' & $sMessage
+        Case 3
+            $sMessage = '  ' & $sMessage
+    EndSwitch
 
-	_ConsoleLogArray ($helptext)
-	_SendEMMessage ("User issued command <help>. Showing help text.")
+    _GUICtrlEdit_AppendText( $cEventLog, $sMessage & @CRLF )
 EndFunc
 
-Func _SendTMessage ($strMessage)
-	$path = @WorkingDir & "\data\communication"
+Func _executeCommand( $sUserInput )
+    _addConsoleLogEntry( '<' & $sUserInput & '>', 1 )
 
-	$completeMessage = ""
+    Local $aCommandTable = _
+        [ _
+            ['help',   '_helpInformation'], _
+            ['--help', '_helpInformation'], _
+            ['-h',     '_helpInformation'], _
+            ['-?',     '_helpInformation'], _
+            ['?',      '_helpInformation'], _
+            ['clear',  '_clearConsole'], _
+            ['cls',    '_clearConsole'], _
+            ['hide',   '_hideConsole'], _
+            ['quit',   '_terminateConsole'], _
+            ['stop',   '_terminateConsole'], _
+            ['send',   '_writeMainReadyFile'] _
+        ]
 
-	For $i = 2 To UBound ($strMessage) -1
-		$completeMessage = $completeMessage & " " & $strMessage[$i]
-	Next
+    Local $aUserInputList    = StringSplit( $sUserInput, ' ' )
+    Local $sUserCommand      = $aUserInputList[1]
+    Local $iCommandListCount = UBound( $aCommandTable ) - 1
 
-	ConsoleWrite($completeMessage & @CRLF)
+    For $i = 0 To $iCommandListCount Step 1
+        Local $sCommand = $aCommandTable[$i][0]
 
-	FileOpen ($path & "\main.txt")
-	FileWrite ($path & "\main.txt", "send" & @CRLF)
-	FileWrite ($path & "\main.txt", $completeMessage)
-	FileClose ($path & "\main.txt")
+        If $sCommand == $sUserCommand Then
+            If $sCommand == 'send' Then
+                _writeMainReadyFile( $aUserInputList )
 
-	FileMove ($path & "\main.txt", $path  & "\main-ready.txt")
-	FileDelete ($path & "\main.txt")
+                Return
+            Else
+                Local $sFunctionName = $aCommandTable[$i][1]
+                Call( $sFunctionName )
 
+                Return
+            EndIf
+        EndIf
+    Next
+
+    _addConsoleLogEntry( 'Unknown command. Type <help> for more information.', 2 )
+    _writeEventReadyFile( 'User typed <' & $sUserCommand & '> which is an unknown command. Ignoring it.' )
 EndFunc
 
-Func _SendEMMessage ($completeMessage, $intLevel=1, $strTime=0)
-	$path = @WorkingDir & "\data\communication"
+Func _helpInformation()
+    Local $sHelpInformation = _
+        '> The following general commands are documented:' & @CRLF & _
+        '  |-- clear, cls              : Clears the console output.' & @CRLF & _
+        '  |-- help, --help, -h, -?, ? : Shows this help information.' & @CRLF & _
+        '  |-- hide                    : Hides the console and creates a tray icon.' & @CRLF & _
+        '  |                             You can restore the console by right-clicking on the tray icon.' & @CRLF & _
+        '  |-- quit, stop              : Shutdown the application.'
 
-
-	FileOpen ($path & "\evm.txt")
-	FileWrite ($path & "\evm.txt", $completeMessage & @CRLF)
-	FileWrite ($path & "\evm.txt", $intLevel & @CRLF)
-	FileWrite ($path & "\evm.txt", $strTime)
-	FileClose ($path & "\evm.txt")
-
-	FileMove ($path & "\evm.txt", $path & "\evm-ready.txt")
-	FileDelete ($path & "\evm.txt")
-
-	Sleep (100)
-
+    _addConsoleLogEntry( $sHelpInformation )
+    _writeEventReadyFile( 'User typed <help>. Showing help text.' )
 EndFunc
 
-Func _CreateConsoleTrayMenu () ;Create a custom trayicon-menu
-
-	TrayCreateItem ("Restore Console")
-	TrayItemSetOnEvent (-1, "_RestoreConsole")
-	TraySetState (2)
-
+Func _clearConsole()
+    GUICtrlSetData( $cEventLog, '' )
+    _writeEventReadyFile( 'User typed <clear>. Clearing console.' )
 EndFunc
 
-While 1
-	Sleep (100)
+Func _hideConsole()
+    _addConsoleLogEntry( 'Hide the console.', 2 )
+    _writeEventReadyFile( 'User typed <hide>. Hiding the console.' )
+    _showTrayIconHideGui()
+EndFunc
 
-	If FileExists ($filedir) Then
-		$aFile = FileReadToArray($filedir)
-		;_ArrayDisplay ($aFile)
-		_ConsoleLog ($aFile[0], $aFile[1], $aFile[2])
-		FileDelete ($filedir)
-	EndIf
-WEnd
+Func _terminateConsole()
+    _addConsoleLogEntry( 'Shutting down console.', 2 )
+    _writeEventReadyFile( 'User typed <quit>. Shutting down console.', 2 )
+
+    Sleep( 500 )
+
+    Exit
+EndFunc
+
+Func _writeMainReadyFile( $aCommandStringList )
+    Local $sCommand = $aCommandStringList[1]
+
+    _ArrayDelete( $aCommandStringList, 0 )
+    _ArrayDelete( $aCommandStringList, 0 )
+
+    Local $sMessage         = _ArrayToString( $aCommandStringList, ' ' )
+    Local $sCompleteMessage = $sCommand & @CRLF & $sMessage
+
+    _writeFile( $sFilePathMain, $sCompleteMessage )
+    _transformToReadyFile( $sFilePathMain, $sFilePathMainReady )
+EndFunc
+
+Func _writeEventReadyFile( $sMessage, $iLevel = 1, $sTime = 0 )
+    Local $sCompleteMessage = $sMessage & @CRLF & $iLevel & @CRLF & $sTime
+
+    _writeFile( $sFilePathEvm, $sCompleteMessage )
+    _transformToReadyFile( $sFilePathEvm, $sFilePathEvmReady )
+
+    Sleep( 150 )
+EndFunc
+
+Func _writeFile( $sFile, $sText )
+    Local Const $iWriteModeCreateDirectoryUtf8 = 2 + 8 + 256
+    Local $hFile = FileOpen( $sFile, $iWriteModeCreateDirectoryUtf8 )
+    FileWrite( $hFile, $sText )
+    FileClose( $hFile )
+EndFunc
+
+Func _transformToReadyFile( $sFromFile, $sToFile )
+    Local Const $iOverwriteCreateDirectory = 1 + 8
+    FileMove( $sFromFile, $sToFile, $iOverwriteCreateDirectory )
+    FileDelete( $sFromFile )
+EndFunc
