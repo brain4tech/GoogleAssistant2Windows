@@ -29,7 +29,7 @@ def configure_logger ():
     filepath = Path (programstart + '.log')
     path = ppath / 'data' / 'logs' / filepath
 
-    f = open(path, "a")
+    f = open(path, "a", encoding='utf8')
     f.write ("--- This is the log-file for the GoogleAssistant2Windows, started on " + date + " at " + time + " ---\n")
     f.close()
 
@@ -58,6 +58,7 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
         final_eventmessage = eventmessage
 
         log_message = "[" + str_level + " " + time + "] " + module + ": " + final_eventmessage + "\n"
+        #print (log_message)
         f = open (path, "a")
         f.write (log_message)
         f.close ()
@@ -75,7 +76,7 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
 
         if eventmessage == "":
             log_message = "[" + str_level + " " + time + "] " + module + ": CONSOLE MESSAGE: " + final_consolemessage + "\n"
-            f = open (path, "a")
+            f = open (path, "a", encoding='utf8')
             f.write (log_message)
             f.close ()
 
