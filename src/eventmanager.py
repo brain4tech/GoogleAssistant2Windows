@@ -58,7 +58,7 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
         final_eventmessage = eventmessage
 
         log_message = "[" + str_level + " " + time + "] " + module + ": " + final_eventmessage + "\n"
-        #print (log_message)
+        #print ("[" + str_level + " " + time + "] " + module + ": " + final_eventmessage)
         f = open (path, "a")
         f.write (log_message)
         f.close ()
