@@ -20,6 +20,12 @@ ppath = getParentPath ()
 
 try:
     os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
+    os.remove (ppath / 'data' / 'communication' / 'console.txt')
+    os.remove (ppath / 'data' / 'communication' / 'console-ready.txt')
+    os.remove (ppath / 'data' / 'communication' / 'evm.txt')
+    os.remove (ppath / 'data' / 'communication' / 'evm-ready.txt')
+    os.remove (ppath / 'data' / 'communication' / 'main.txt')
+    os.remove (ppath / 'data' / 'communication' / 'main-ready.txt')
 except Exception as e:
     pass
 
@@ -47,10 +53,7 @@ def communicationFunc():
     global listener_callback
     listener_callback = True
 
-    global loop_callback
-    loop_callback = True
-
-    while loop_callback == True:
+    while 1:
         fileexists1 = os.path.isfile (ppath / 'data' / 'communication' / 'main-ready.txt')
 
         if fileexists1 == True:
@@ -71,7 +74,6 @@ def communicationFunc():
                 module="MAIN", level=2, mprefix=1, time=current_time())
 
                 interpreter_return = interpreter.interpreter(messageData1[1])
-                #print (interpreter_return)
                 evm.event_log(interpreter_return, module="INTERPRETER", level=2)
 
                 file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a", encoding='utf8')
@@ -86,16 +88,16 @@ def communicationFunc():
                     if messageData1[1] == "true":
                         if listener_callback != True:
                             listener_callback = True
-                            evm.event_log("Set onlinemode back to 'true'.", "Set onlinemode back to 'true'. Commands via Telegram can be recieved again.")
+                            evm.event_log("Set onlinemode back to 'true'.", "Set onlinemode back to 'true'. Commands via Telegram can be recieved again.", module="LISTENER", mprefix=2)
                         else:
-                            evm.event_log("Nothing has changed. Onlinemode was already 'true'.", "Nothing has changed. Onlinemode was already 'true'.")
+                            evm.event_log("Nothing has changed. Onlinemode was already 'true'.", "Nothing has changed. Onlinemode was already 'true'.", module="LISTENER", mprefix=2)
 
                     elif messageData1[1] == "false":
                         if listener_callback != False:
                             listener_callback = False
-                            evm.event_log("Set onlinemode back to 'false'.", "Set onlinemode back to 'true'. Commands via Telegram are ignored until it is set back to 'true'")
+                            evm.event_log("Set onlinemode to 'false'.", "Set onlinemode to 'false'. Commands via Telegram are ignored.", module="LISTENER", mprefix=2)
                         else:
-                            evm.event_log("Nothing has changed. Onlinemode was already 'false'.", "Nothing has changed. Onlinemode was already 'false'.")
+                            evm.event_log("Nothing has changed. Onlinemode was already 'false'.", "Nothing has changed. Onlinemode was already 'false'.", module="LISTENER", mprefix=2)
                 else:
                     evm.event_log("Error, command called with wrong number of arguments.", consolemessage="Error. Please define the state of the program by using 'true' or 'false' as argument.", module="INTERPRETER", level=2, mprefix=2)
 
@@ -105,7 +107,7 @@ def communicationFunc():
 
             f = open (ppath / 'data' / 'communication' / 'evm-ready.txt', "r")
             lines = f.read()
-            f.close ()
+            f.close()
             os.remove(ppath / 'data' / 'communication' / 'evm-ready.txt')
 
             messageData2 = lines.splitlines()
@@ -116,9 +118,71 @@ def communicationFunc():
 
         if fileexists3 == True:
             evm.event_log ("Shutting down communicationthread.", module = "MAIN", level=2)
-            loop_callback = False
+            return
 
         time.sleep (0.05)
+
+def telegram_listener ():
+    global listener_callback
+    listener_callback = True
+
+    #Prepare Listener Loop
+    botToken = tl.get_botToken()
+    chatID = tl.get_chatID()
+
+    evm.event_log("Prepared Listener with "+ botToken + " as token for Telegram API.", module="MAIN", level=2)
+
+    #start while-loop and main program
+    while True:
+
+        result = tl.Polling(botToken)
+
+        while listener_callback == False:
+            result_reconnect = tl.Polling(botToken)
+            if result_reconnect == False:
+                evm.event_log ("Shutting down listenerthread", module = "MAIN", level=2)
+                sys.exit()
+            else:
+                time.sleep(3)
+
+        #Handle exceptions before mainloop
+        if result == "ConnectionError":
+            evm.event_log("Connection Error. Reconnecting...",
+            "An error occured (Connection Error). Program will automatically reconnect",
+            module="LISTENER", time=current_time(), level=3, mprefix=1)
+
+            while 1:
+                result_reconnect = tl.Polling(botToken)
+                if result_reconnect == False:
+                    evm.event_log ("Shutting down listenerthread", module = "MAIN", level=2)
+                    sys.exit()
+                elif result_reconnect != "ConnectionError":
+                    evm.event_log("Connection reestablished.", "Connection reestablished.", module="LISTENER", time=current_time(), level=2, mprefix=1)
+                    break
+                else:
+                    time.sleep(3)
+
+
+        elif result == False:
+            evm.event_log ("Shutting down listenerthread", module = "MAIN", level=2)
+            return
+        else:
+
+            if result['channel_post']['chat']['id'] == int(chatID):
+
+                result_text = result['channel_post']['text']
+
+                evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
+                "New incoming commmand: <" + result_text + ">. Analysing ...",
+                module="LISTENER", level=2, mprefix=1, time=current_time())
+
+                interpreter_return = interpreter.interpreter(result_text)
+                evm.event_log(interpreter_return, module="INTERPRETER", level=2)
+
+                file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a")
+                file.write (interpreter_return)
+                file.close()
+                os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
 
 
 #Start mainloop
@@ -132,69 +196,28 @@ if __name__ == '__main__':
     communication_thread.start()
     evm.event_log("Started communicationthread.", module="MAIN", level=2)
 
+    #Start Communication-Thread
+    listener_thread = Thread (target=telegram_listener)
+    listener_thread.start()
+    evm.event_log("Started listenerthread.", module="MAIN", level=2)
+
     #Start console
     subprocess.Popen(str(ppath / 'ui' / 'GA2W Console.exe'))
     evm.event_log("Started console UI.", module = "MAIN", level=2)
 
-    #Prepare Listener Loop
-    botToken = tl.get_botToken()
-    chatID = tl.get_chatID()
+    #Starting mainloop
+    while 1:
+        fileexists4 = os.path.isfile(ppath / 'data' / 'communication' / 'terminate.txt')
 
-    evm.event_log("Prepared Listener with "+ botToken + " as token for Telegram API.", module="MAIN", level=2)
-
-    #start while-loop and main program
-    while True:
-        while listener_callback == False:
-            time.sleep(1)
-
-        result = tl.Polling(botToken)
-
-        while listener_callback == False:
-            time.sleep(5)
-
-        #Handle exceptions before mainloop
-        if result == "ConnectionError":
-            evm.event_log("Connection Error. Reconnection in 30 Seconds",
-            "An error occured (Connection Error). Program will reconnect when a new internet connection is established.",
-            module="MAIN", time=current_time(), level=3, mprefix=1)
-
-            """
-            while True:
-                result_wait = tl.Polling(botToken)
-                if result_wait == False:
-                    evm.event_log ("Shutting down mainthread", module = "MAIN", level=2)
-                    result = False
-                    break
-                elif result_wait != "ConnectionError":
-                    result = result_wait
-                    break"""
-
-        elif result == False:
-            evm.event_log ("Shutting down mainthread", module = "MAIN", level=2)
+        if fileexists4 == True:
+            communication_thread.join()
+            listener_thread.join()
             break
         else:
-
-            if result['channel_post']['chat']['id'] == int(chatID):
-
-                result_text = result['channel_post']['text']
-
-                evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
-                "New incoming commmand: <" + result_text + ">. Analysing ...",
-                module="MAIN", level=2, mprefix=1, time=current_time())
-
-                interpreter_return = interpreter.interpreter(result_text)
-                evm.event_log(interpreter_return, module="INTERPRETER", level=2)
-
-                file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a")
-                file.write (interpreter_return)
-                file.close()
-                os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
-
-        while listener_callback == False:
-            print ("listener callback is false")
-            time.sleep(1)
+            time.sleep(3)
 
 #Finishing and clearning up
+
 os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
 evm.event_log("Program terminated.", module="MAIN", level=2)
 sys.exit()

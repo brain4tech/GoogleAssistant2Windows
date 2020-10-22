@@ -62,7 +62,7 @@ def Polling (token):
                 OFFSET = result['update_id'] + 1
                 return result
 
-        except requests.exceptions.ConnectionError:
+        except Exception as e:
             return "ConnectionError"
 
         fileexists = os.path.isfile(ppath / 'data' / 'communication' / 'terminate.txt')

@@ -43,7 +43,7 @@ Global $hGui, $cEventLog, $cUserInput
 
 
 ; processing -------------------------------------------------------------------
-_cleanupOldData()
+;_cleanupOldData()
 _createCustomTrayMenu()
 _createGui()
 _setGuiEvents()
@@ -69,7 +69,7 @@ EndFunc
 
 Func _createGui()
     Local $iGuiWidth     = 900
-    Local $iGuiHeight    = 400
+    Local $iGuiHeight    = 300
     Local $iGuiXPosition = Default
     Local $iGuiYPosition = Default
 
