@@ -41,10 +41,6 @@ def analyseCommand (input):
 
     return commandfound
 
-
-def analyseTarget (input, cmdID):
-    print ("Target")
-
 def executeCommand (callfunc, param = None):
     function = getattr(callfunctions, callfunc)
     returnvalue = function(param)
@@ -184,9 +180,6 @@ def interpreter (input_raw):
         newstring = newstring.lstrip()
         singlecommands[x] = newstring
 
-    #print (singlecommands)
-    #print ("")
-
     #As the position of the commands is unknown again due to splitting and removing parts of the input,
     #the commands have to be analysed again and executed for every index of singlecommands
 
@@ -227,12 +220,11 @@ def interpreter (input_raw):
                 addToSummaryString("")
 
         else:
-            #addToSummaryString("\n")
-            analyseTarget(splittedInput, result[0][0])
-            #printExecutionReturn(returnvalue)
+            addToSummaryString([False, "No valid target in commandlibrary"])
+            pass
 
     return summarystring
 
 
 if __name__ == '__main__':
-    interpreter("öffne word thunderbird")
+    print (interpreter("protokoll online"))

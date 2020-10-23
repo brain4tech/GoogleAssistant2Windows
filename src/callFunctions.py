@@ -1,6 +1,7 @@
 import ctypes
 from callfunctiondir.callfunc_start import cf_start
 from callfunctiondir.callfunc_stop import cf_stop
+from callfunctiondir.callfunc_workflow import cf_workflow
 
 def start(input): #start a program
     returnvalue = cf_start(input)
@@ -9,7 +10,10 @@ def start(input): #start a program
 
 def stop (input): #terminate a running program
     returnvalue = cf_stop(input)
-    #print (returnvalue)
+    return returnvalue
+
+def workflow (input): #execute a workflow/protocol
+    returnvalue = cf_workflow (input)
     return returnvalue
 
 def lock (input): #Locks the windows user

@@ -44,14 +44,13 @@
     "targets": "False",
     "callfunc": "blackout"
   },
-  "protocol": {
+  "workflow": {
     "commands": [
-      "protokoll"
+      "protokoll",
+	  "protokol"
     ],
-    "targets": [
-      "test"
-    ],
-    "callfunc": "protocol"
+    "targets": "True",
+    "callfunc": "workflow"
   },
   "play-pause": {
     "commands": [
