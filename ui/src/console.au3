@@ -68,7 +68,7 @@ Func _createCustomTrayMenu()
 EndFunc
 
 Func _createGui()
-    Local $iGuiWidth     = 900
+    Local $iGuiWidth     = 800
     Local $iGuiHeight    = 300
     Local $iGuiXPosition = Default
     Local $iGuiYPosition = Default
@@ -273,12 +273,12 @@ Func _terminateConsole()
     _writeEventReadyFile( 'User typed <quit>. Program is terminating.', 2 )
 	_addConsoleLogEntry( 'Shutting down background processes ...', 2 )
 
-	_writeFile( $sFilePathTerminate, "")
+	FileOpen($sFilePathTerminate, 1)
 
 	_addConsoleLogEntry( 'Terminating console ...', 2 )
 	_addConsoleLogEntry( 'Bye!', 2 )
 
-	Sleep( 500 )
+	Sleep(1000 )
 
     Exit
 EndFunc

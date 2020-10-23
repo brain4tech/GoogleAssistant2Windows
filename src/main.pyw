@@ -68,7 +68,7 @@ def communicationFunc():
             if messageData1[0] == "send": #Send telegram message
                 sendTelegramMessage (messageData1[1])
 
-            if messageData1[0] == "m" or messageData1[0] == "i": #analyse manual command
+            elif messageData1[0] == "m" or messageData1[0] == "i": #analyse manual command
                 evm.event_log("Manual command: <" + messageData1[1] + ">. Sending to Interpreter.",
                 "Manual commmand: <" + messageData1[1] + ">. Analysing ...",
                 module="MAIN", level=2, mprefix=1, time=current_time())
@@ -81,7 +81,7 @@ def communicationFunc():
                 file.close()
                 os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
 
-            if messageData1[0] == "online": #decide if program should receive new messages
+            elif messageData1[0] == "online" or messageData1[0] == "on" or messageData1[0] == "om": #decide if program should receive new messages
                 if len(messageData1)> 1:
 
                     messageData1[1] = messageData1[1].lower()
@@ -185,8 +185,8 @@ def telegram_listener ():
                 os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
 
 
-#Start mainloop
-if __name__ == '__main__':
+
+def main():
 
     #Start the program
     evm.configure_logger()
@@ -216,8 +216,14 @@ if __name__ == '__main__':
         else:
             time.sleep(3)
 
-#Finishing and clearning up
+    #Finishing and clearning up
 
-os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
-evm.event_log("Program terminated.", module="MAIN", level=2)
-sys.exit()
+    os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
+    evm.event_log("Program terminated.", module="MAIN", level=2)
+    sys.exit()
+
+
+
+#Start mainloop
+if __name__ == '__main__':
+    main()
