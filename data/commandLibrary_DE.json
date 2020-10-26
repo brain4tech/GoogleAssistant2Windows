@@ -39,7 +39,7 @@
   },
   "dark": {
     "commands": [
-      "dunkelschalten"
+      "dunkel"
     ],
     "targets": "False",
     "callfunc": "blackout"

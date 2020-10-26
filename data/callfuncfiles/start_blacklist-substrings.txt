@@ -1,0 +1,22 @@
+(x86)
+(32-bit)
+uninstal
+deinstallieren
+updates
+website
+help
+more
+documentation
+readme
+abgesicherter modus
+entfernen
+manual
+regristrieren
+examples
+beispiele
+vlc media player skinned
+vlc media player - reset preferences and cache files
+windows powershell ise
+extra
+wordpad
+diagnostics

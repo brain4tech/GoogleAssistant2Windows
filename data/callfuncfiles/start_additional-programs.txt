@@ -1,0 +1,16 @@
+{
+  "programs": [
+    [
+      "calculator",
+      "calc.exe"
+    ],
+    [
+      "explorer",
+      "explorer.exe"
+    ],
+    [
+      "cmd",
+      "cmd.exe"
+    ]
+  ]
+}

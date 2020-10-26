@@ -1,6 +1,3 @@
-#ignore all .txt files
-*.txt
-
 #ignore log-files
 *.log
 
@@ -9,7 +6,3 @@
 
 #ignore the python cache-folder
 __pychache__
-
-!data
-
-*.tmp.drivedownload

@@ -1,0 +1,57 @@
+{
+  "start": {
+    "commands": [
+      "open",
+      "start",
+      "execute"
+    ],
+    "targets": "True",
+    "callfunc": "start"
+  },
+  "stop": {
+    "commands": [
+      "stop",
+      "terminate",
+      "quit"
+    ],
+    "targets": "True",
+    "callfunc": "stop"
+  },
+  "lock": {
+    "commands": [
+      "lock"
+    ],
+    "targets": "False",
+    "callfunc": "lock"
+  },
+  "desktop": {
+    "commands": [
+      "desktop"
+    ],
+    "targets": "False",
+    "callfunc": "desktop"
+  },
+  "dark": {
+    "commands": [
+      "dark"
+    ],
+    "targets": "False",
+    "callfunc": "blackout"
+  },
+  "workflow": {
+    "commands": [
+      "protocol",
+      "workflow"
+    ],
+    "targets": "True",
+    "callfunc": "workflow"
+  },
+  "play-pause": {
+    "commands": [
+      "play",
+      "pause"
+    ],
+    "targets": "False",
+    "callfunc": "pause"
+  }
+}
