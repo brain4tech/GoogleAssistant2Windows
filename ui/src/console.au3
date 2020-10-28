@@ -29,6 +29,7 @@ If $aInst[0][0] > 1 Then Exit
 
 ; declaration ------------------------------------------------------------------
 Global $sPathCommunication    = _PathFull( '..\data\communication\' )
+;MsgBox ("", "", $sPathCommunication)
 Global $sFilePathConsole      = $sPathCommunication & 'console.txt'
 Global $sFilePathConsoleReady = $sPathCommunication & 'console-ready.txt'
 Global $sFilePathEvm          = $sPathCommunication & 'evm.txt'
