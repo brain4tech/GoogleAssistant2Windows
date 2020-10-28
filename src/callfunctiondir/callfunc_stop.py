@@ -123,7 +123,7 @@ def cf_stop(input):
             returnvalue = [False, result[0], result[1], result[2], result[3]]
 
     else:
-        returnvalue = [False, "No match found"]
+        returnvalue = [False, "No match found", ""]
 
     return returnvalue
 
