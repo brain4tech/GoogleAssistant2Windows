@@ -48,6 +48,13 @@ def sendTelegramMessage (input):
     else:
         evm.event_log("User issued command <send> without a message, ignoring it.", consolemessage= "Error: No message found behind the command.", level=1, mprefix=2, module="Console", time=nowtime)
 
+def sendTelegramMessageSilent (input):
+    nowtime = current_time()
+    message = input.lstrip()
+
+    if message != "":
+        result = tl.sendMessage(message)
+
 #Function to recieve and read messages from eventmanager
 def communicationFunc():
     global listener_callback
@@ -167,22 +174,30 @@ def telegram_listener ():
             evm.event_log ("Shutting down listenerthread", module = "MAIN", level=2)
             return
         else:
+            try:
 
-            if result['channel_post']['chat']['id'] == int(chatID):
+                if result['channel_post']['chat']['id'] == int(chatID):
 
-                result_text = result['channel_post']['text']
+                    result_text = result['channel_post']['text']
 
-                evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
-                "New incoming commmand: <" + result_text + ">. Analysing ...",
-                module="LISTENER", level=2, mprefix=1, time=current_time())
+                    evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
+                    "New incoming commmand: <" + result_text + ">. Analysing ...",
+                    module="LISTENER", level=2, mprefix=1, time=current_time())
 
-                interpreter_return = interpreter.interpreter(result_text)
-                evm.event_log(interpreter_return, module="INTERPRETER", level=2)
+                    interpreter_return = interpreter.interpreter(result_text)
+                    evm.event_log(interpreter_return, module="INTERPRETER", level=2)
 
-                file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a")
-                file.write (interpreter_return)
-                file.close()
-                os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
+                    sendTelegramMessageSilent ('Analysis | "' + result_text + '"\n' + interpreter_return)
+
+                    file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a")
+                    file.write (interpreter_return)
+                    file.close()
+                    os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
+
+            except Exception as c:
+                print (c)
+                pass
+
 
 
 
