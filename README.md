@@ -1,6 +1,7 @@
 ## googleassistant2windows
 
 THIS PROJECT IS STILL IN DEVELOPMENT. INFORMATION ON HOW TO INSTALL AND USE THE PROGRAM WILL COME SOON!
+
 How to set up the program: https://youtu.be/fkwVXExyV48 (German, Englisch subtitles are coming soon!)
 
 Please note: This is my first big project. I`m a beginner to programming, my study just started. I wanted to make my code public in order to share my idea. Feedback and help are welcome. If you notice a bug or you need a feature, please open an issue, and I will answer asap.
