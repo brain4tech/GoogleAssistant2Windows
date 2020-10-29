@@ -1,6 +1,3 @@
-#ignore log-files
-*.log
-
 #ignore all cache-files
 *.pyc
 
