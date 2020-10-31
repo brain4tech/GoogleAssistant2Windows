@@ -165,6 +165,31 @@ def telegram_listener ():
                     sys.exit()
                 elif result_reconnect != "ConnectionError":
                     evm.event_log("Connection reestablished.", "Connection reestablished.", module="LISTENER", time=current_time(), level=2, mprefix=1)
+
+                    try:
+
+                        if result['channel_post']['chat']['id'] == int(chatID):
+
+                            result_text = result['channel_post']['text']
+
+                            evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
+                            "New incoming commmand: <" + result_text + ">. Analysing ...",
+                            module="LISTENER", level=2, mprefix=1, time=current_time())
+
+                            interpreter_return = interpreter.interpreter(result_text)
+                            evm.event_log(interpreter_return, module="INTERPRETER", level=2)
+
+                            sendTelegramMessageSilent ('Analysis | "' + result_text + '"\n' + interpreter_return)
+
+                            file = open(ppath / 'data' / 'communication' / 'interpreter.txt', "a")
+                            file.write (interpreter_return)
+                            file.close()
+                            os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
+
+                    except Exception as c:
+                        #print (c)
+                        pass
+
                     break
                 else:
                     time.sleep(3)
@@ -195,7 +220,7 @@ def telegram_listener ():
                     os.rename(ppath / 'data' / 'communication' / 'interpreter.txt', ppath / 'data' / 'communication' / 'interpreter-ready.txt')
 
             except Exception as c:
-                print (c)
+                #print (c)
                 pass
 
 
