@@ -1,5 +1,8 @@
 #ignore all cache-files
 *.pyc
 
+#ignore .vscode-folder
+.vscode
+
 #ignore the python cache-folder
 __pychache__
