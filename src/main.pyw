@@ -166,6 +166,8 @@ def telegram_listener ():
                 elif result_reconnect != "ConnectionError":
                     evm.event_log("Connection reestablished.", "Connection reestablished.", module="LISTENER", time=current_time(), level=2, mprefix=1)
 
+                    result = result_reconnect
+
                     try:
 
                         if result['channel_post']['chat']['id'] == int(chatID):
