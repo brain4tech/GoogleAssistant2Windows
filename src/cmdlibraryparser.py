@@ -25,7 +25,6 @@ def getCommands ():
             command = commands[x]
             commandlist.append([commandId, command])
 
-    #print (commandlist)
     return commandlist
 
 def getTargets (commandId):

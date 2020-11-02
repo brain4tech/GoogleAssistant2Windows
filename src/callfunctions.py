@@ -5,7 +5,6 @@ from callfunctiondir.callfunc_workflow import cf_workflow
 
 def start(input): #start a program
     returnvalue = cf_start(input)
-    #print (returnvalue)
     return returnvalue
 
 def stop (input): #terminate a running program

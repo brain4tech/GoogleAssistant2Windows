@@ -58,7 +58,6 @@ def event_log (eventmessage, consolemessage="", module="", level = 1, time = 0, 
         final_eventmessage = eventmessage
 
         log_message = "[" + str_level + " " + time + "] " + module + ": " + final_eventmessage + "\n"
-        #print ("[" + str_level + " " + time + "] " + module + ": " + final_eventmessage)
         f = open (path, "a")
         f.write (log_message)
         f.close ()
@@ -100,7 +99,7 @@ def write_consoleFile (messageArray):
     os.rename (com_path, ppath / 'data' / 'communication' / 'console-ready.txt')
 
 
-#Function to send a message to mainloop
+#Function to send a message to main loop
 def write_mainFile (messageArray):
     com_path = ppath / 'data' / 'communication' / 'main.txt'
 
