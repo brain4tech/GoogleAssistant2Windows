@@ -99,10 +99,10 @@ def start ():
 def console_Polling (token, guitext):
     result = Polling(token)
 
-    #Handle exceptions before mainloop
+    #Handle exceptions before main loop
     if result == "ConnectionError":
         evm.event_log("Connection Error. Reconnection in 30 Seconds",
-        "An error occured (Connection Error). Program will try to reconnect in 30 seconds.",
+        "An error occurred (Connection Error). Program will try to reconnect in 30 seconds.",
         module="Listener", time=current_time(), level=3, mprefix=1, guitext=guitext)
         time.sleep(30)
     else:
@@ -113,7 +113,7 @@ def console_Polling (token, guitext):
             #print (result_text)
 
             evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
-            "New incoming commmand: <" + result_text + ">. Analysing ...",
+            "New incoming command: <" + result_text + ">. Analysing ...",
             module="Listener", level=2, mprefix=1, time=current_time(), guitext=guitext)
 
             #send to intepreter

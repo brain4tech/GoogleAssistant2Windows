@@ -12,8 +12,8 @@ Please note: This is my first big project. I am a beginner to programming, my st
 
 Information on the repository: This repository is the cloud storage for my project 'GoogleAssistant2Windows', short: GA2W. It is an application which executes commands from your Google Assistant on your computer (currently there is only Windows-support). It's not directly from the Assistant to the computer. It uses a detour with IFTTT.com and Telegram.
 
-This project is in progress. Once, I pre-programmed it in AutoIt, a programming language from which I learned to program. But I want to improve my programming skills, knowledge and my GA2W-application, so i decided to re-program the app in Python, make it better and more reliable.
+This project is in progress. Once, I pre-programmed it in AutoIt, a programming language from which I learned to program. But I want to improve my programming skills, knowledge and my GA2W-application, so I decided to re-program the app in Python, make it better and more reliable.
 
-I'm making short devlogs about the progress every week on my YouTube-channel. It's in German though.
+I'm making short Devlogs about the progress every week on my YouTube-channel. It's in German though.
 
 English is not my first language. So, yeah. Sorry about any spelling or grammar mistakes :D

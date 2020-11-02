@@ -71,15 +71,15 @@ def createTargetString(input, index):
 def printExecutionReturn(list):
     if list == None:
         addToSummaryString(
-            "An Error occured while gaining and printing the executionresults."
+            "An Error occurred while gaining and printing the execution results."
         )
         return
 
     if list[0] == True:
-        addToSummaryString("Execution successfull!")
+        addToSummaryString("Execution successful!")
 
         if len(list) > 1:
-            addToSummaryString("Executioninfo:")
+            addToSummaryString("Execution info:")
             for x in range(1, len(list)):
                 if list[x] == "":
                     addToSummaryString("    > " + "Empty")
@@ -90,7 +90,7 @@ def printExecutionReturn(list):
         addToSummaryString("Execution failed!")
 
         if len(list) > 1:
-            addToSummaryString("Executioninfo:")
+            addToSummaryString("Execution info:")
             for x in range(1, len(list)):
                 if list[x] == "":
                     addToSummaryString("    > " + "Empty")
@@ -111,7 +111,7 @@ def interpreter(input_raw):
     global summarystring
     summarystring = ""
 
-    # Prepare for algorithm and gain recources
+    # Prepare for algorithm and gain resources
     input = prepareInput(input_raw)
     splitstrings = getSplitStrings()
 
@@ -125,8 +125,8 @@ def interpreter(input_raw):
     tempstring = ""
     startindex = 0
 
-    # Seperate commands from each other and create own smaller strings
-    # "öffne whatsapp schließe discord" --> [["öffne whatsapp"], ["schließe discord"]]
+    # Separate commands from each other and create own smaller strings
+    # "open whatsapp close discord" --> [["open whatsapp"], ["close discord"]]
     for x in range(len(input)):
         for y in range(len(commandresults)):
             tempindex = commandresults[y][2]
@@ -179,8 +179,6 @@ def interpreter(input_raw):
         del singlecommands[x - counter]
         counter = counter + 1
 
-    # print (singlecommands)
-
     for x in range(len(singlecommands)):
         splitted = singlecommands[x].split()
         newstring = ""
@@ -188,6 +186,8 @@ def interpreter(input_raw):
 
         for y in range(len(splitted)):
             if splitted[y] in "und" or splitted[y] in "bitte":
+                index = y
+            elif splitted[y] in "and" or splitted[y] in "please":
                 index = y
 
             if y != index:
@@ -236,11 +236,11 @@ def interpreter(input_raw):
                 addToSummaryString("")
 
         else:
-            addToSummaryString([False, "No valid target in commandlibrary"])
+            addToSummaryString([False, "No valid target in command library"])
             pass
 
     return summarystring
 
 
 if __name__ == "__main__":
-    print(interpreter("protokoll online"))
+    print(interpreter("protocol online"))

@@ -55,7 +55,7 @@ def sendTelegramMessageSilent (input):
     if message != "":
         result = tl.sendMessage(message)
 
-#Function to recieve and read messages from eventmanager
+#Function to receive and read messages from eventmanager
 def communicationFunc():
     global listener_callback
     listener_callback = True
@@ -77,7 +77,7 @@ def communicationFunc():
 
             elif messageData1[0] == "m" or messageData1[0] == "i": #analyse manual command
                 evm.event_log("Manual command: <" + messageData1[1] + ">. Sending to Interpreter.",
-                "Manual commmand: <" + messageData1[1] + ">. Analysing ...",
+                "Manual command: <" + messageData1[1] + ">. Analysing ...",
                 module="MAIN", level=2, mprefix=1, time=current_time())
 
                 interpreter_return = interpreter.interpreter(messageData1[1])
@@ -95,7 +95,7 @@ def communicationFunc():
                     if messageData1[1] == "true":
                         if listener_callback != True:
                             listener_callback = True
-                            evm.event_log("Set onlinemode back to 'true'.", "Set onlinemode back to 'true'. Commands via Telegram can be recieved again.", module="LISTENER", mprefix=2)
+                            evm.event_log("Set onlinemode back to 'true'.", "Set onlinemode back to 'true'. Commands via Telegram can be received again.", module="LISTENER", mprefix=2)
                         else:
                             evm.event_log("Nothing has changed. Onlinemode was already 'true'.", "Nothing has changed. Onlinemode was already 'true'.", module="LISTENER", mprefix=2)
 
@@ -152,10 +152,10 @@ def telegram_listener ():
             else:
                 time.sleep(3)
 
-        #Handle exceptions before mainloop
+        #Handle exceptions before main loop
         if result == "ConnectionError":
             evm.event_log("Connection Error. Reconnecting...",
-            "An error occured (Connection Error). Program will automatically reconnect",
+            "An error occurred (Connection Error). Program will automatically reconnect",
             module="LISTENER", time=current_time(), level=3, mprefix=1)
 
             while 1:
@@ -164,7 +164,7 @@ def telegram_listener ():
                     evm.event_log ("Shutting down listenerthread", module = "MAIN", level=2)
                     sys.exit()
                 elif result_reconnect != "ConnectionError":
-                    evm.event_log("Connection reestablished.", "Connection reestablished.", module="LISTENER", time=current_time(), level=2, mprefix=1)
+                    evm.event_log("Connection re-established.", "Connection re-established.", module="LISTENER", time=current_time(), level=2, mprefix=1)
 
                     result = result_reconnect
 
@@ -175,7 +175,7 @@ def telegram_listener ():
                             result_text = result['channel_post']['text']
 
                             evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
-                            "New incoming commmand: <" + result_text + ">. Analysing ...",
+                            "New incoming command: <" + result_text + ">. Analysing ...",
                             module="LISTENER", level=2, mprefix=1, time=current_time())
 
                             interpreter_return = interpreter.interpreter(result_text)
@@ -208,7 +208,7 @@ def telegram_listener ():
                     result_text = result['channel_post']['text']
 
                     evm.event_log("New incoming command: <" + result_text + ">. Sending to Interpreter.",
-                    "New incoming commmand: <" + result_text + ">. Analysing ...",
+                    "New incoming command: <" + result_text + ">. Analysing ...",
                     module="LISTENER", level=2, mprefix=1, time=current_time())
 
                     interpreter_return = interpreter.interpreter(result_text)
@@ -247,7 +247,7 @@ def main():
     subprocess.Popen(str(ppath / 'ui' / 'GA2W Console.exe'))
     evm.event_log("Started console UI.", module = "MAIN", level=2)
 
-    #Starting mainloop
+    #Starting main loop
     while 1:
         fileexists4 = os.path.isfile(ppath / 'data' / 'communication' / 'terminate.txt')
 
@@ -258,7 +258,7 @@ def main():
         else:
             time.sleep(3)
 
-    #Finishing and clearning up
+    #Finishing and clearing up
 
     os.remove (ppath / 'data' / 'communication' / 'terminate.txt')
     evm.event_log("Program terminated.", module="MAIN", level=2)
@@ -266,6 +266,6 @@ def main():
 
 
 
-#Start mainloop
+#Start main loop
 #if __name__ == '__main__':
 main()

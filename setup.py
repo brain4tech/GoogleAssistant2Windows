@@ -13,7 +13,7 @@ def writebotToken (botToken):
 print ("Hello!")
 print ("This script is going to set up the GoogleAssistant2Windows-folder for you. Let's start!")
 print ("")
-print ("For the GA2W you need to create a bot. While you did it, Botfather gave you an HTTP API-Token")
+print ("For the GA2W you need to create a bot. While you did it, BotFather gave you an HTTP API-Token")
 botToken = input (">> Please insert the token: ")
 
 writebotToken(botToken)
@@ -26,7 +26,7 @@ while 1:
         update = requests.get ("https://api.telegram.org/bot" + botToken + "/getUpdates")
         request_json = update.json()
     except Exception:
-        print ("An Error occured, please try again later")
+        print ("An Error occurred, please try again later")
 
     json_result = request_json['result']
     content = json_result[-1]
@@ -69,7 +69,7 @@ while 1:
         os.rename("data\\interpreter\\splitwords_" + language + ".txt", "data\\interpreter\\splitwords.txt")
         break
     else:
-        language = input ("Please enter a valid languagecode: ")
+        language = input ("Please enter a valid language code: ")
 
 print ("")
 print ("The setup is completed! Have fun with your GA2W!")
