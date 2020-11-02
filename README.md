@@ -2,6 +2,7 @@
 **THIS PROJECT IS STILL IN DEVELOPMENT. INFORMATION ON HOW TO INSTALL AND USE THE PROGRAM WILL COME SOON!**
 
 How to set up the program: https://youtu.be/fkwVXExyV48 (German, with English subtitles)
+Run setup.py to skip some steps from the video (Part 1 only, API-token required).
 
 *needed libraries:*
 - requests (pip install requests)
