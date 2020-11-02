@@ -1,31 +1,79 @@
 import os
-from pathlib import Path
-import win32api
 import subprocess
+from pathlib import Path
 
-def WopenSocialPrograms ():
-
-    globalUserPath = os.environ.get('USERPROFILE')
-
-    win32api.ShellExecute (0, None, globalUserPath + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/WhatsApp/Whatsapp.lnk", None, None, 1)
-    win32api.ShellExecute (0, None, globalUserPath + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Discord Inc/Discord.lnk", None, None, 1)
-    win32api.ShellExecute (0, None, globalUserPath + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Telegram Desktop/Telegram.lnk", None, None, 1)
-    win32api.ShellExecute (0, None, globalUserPath + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Samuel Attard/Google Play Music Desktop Player.lnk", None, None, 1)
-
-def WcloseSocialPrograms ():
-    subprocess.run(["taskkill", "-F", "-IM", "whatsapp.exe"], stdout = subprocess.PIPE, encoding='cp850', stderr=subprocess.PIPE)
-    subprocess.run(["taskkill", "-F", "-IM", "discord.exe"], stdout = subprocess.PIPE, encoding='cp850', stderr=subprocess.PIPE)
-    subprocess.run(["taskkill", "-F", "-IM", "telegram.exe"], stdout = subprocess.PIPE, encoding='cp850', stderr=subprocess.PIPE)
+import win32api
 
 
-def getWorkflowList ():
-    list = [
-    ["online", "WopenSocialPrograms"],
-    ["offline", "WcloseSocialPrograms"]
-    ]
+def WopenSocialPrograms():
+
+    globalUserPath = os.environ.get("USERPROFILE")
+
+    win32api.ShellExecute(
+        0,
+        None,
+        globalUserPath
+        + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/WhatsApp/Whatsapp.lnk",
+        None,
+        None,
+        1,
+    )
+    win32api.ShellExecute(
+        0,
+        None,
+        globalUserPath
+        + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Discord Inc/Discord.lnk",
+        None,
+        None,
+        1,
+    )
+    win32api.ShellExecute(
+        0,
+        None,
+        globalUserPath
+        + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Telegram Desktop/Telegram.lnk",
+        None,
+        None,
+        1,
+    )
+    win32api.ShellExecute(
+        0,
+        None,
+        globalUserPath
+        + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Samuel Attard/Google Play Music Desktop Player.lnk",
+        None,
+        None,
+        1,
+    )
+
+
+def WcloseSocialPrograms():
+    subprocess.run(
+        ["taskkill", "-F", "-IM", "whatsapp.exe"],
+        stdout=subprocess.PIPE,
+        encoding="cp850",
+        stderr=subprocess.PIPE,
+    )
+    subprocess.run(
+        ["taskkill", "-F", "-IM", "discord.exe"],
+        stdout=subprocess.PIPE,
+        encoding="cp850",
+        stderr=subprocess.PIPE,
+    )
+    subprocess.run(
+        ["taskkill", "-F", "-IM", "telegram.exe"],
+        stdout=subprocess.PIPE,
+        encoding="cp850",
+        stderr=subprocess.PIPE,
+    )
+
+
+def getWorkflowList():
+    list = [["online", "WopenSocialPrograms"], ["offline", "WcloseSocialPrograms"]]
     return list
 
-def comparisonAlgorithm (array, input):
+
+def comparisonAlgorithm(array, input):
     input = input.split()
     summarylist = []
     targetsinInput = []
@@ -34,8 +82,8 @@ def comparisonAlgorithm (array, input):
         indexsplit = array[x][0].split()
         localcounter = 0
 
-        for y in range (len(input)):
-            for z in range (len(indexsplit)):
+        for y in range(len(input)):
+            for z in range(len(indexsplit)):
                 inputindex = input[y]
                 listindex = indexsplit[z]
 
@@ -45,14 +93,20 @@ def comparisonAlgorithm (array, input):
                     targetsinInput.append(y)
 
         if localcounter > 0:
-            summarylist.append([localcounter, x, array[x][0], targetsinInput]) #counter, index in array
+            summarylist.append(
+                [localcounter, x, array[x][0], targetsinInput]
+            )  # counter, index in array
             targetsinInput = []
 
     if summarylist == []:
         return False
 
     summarylist.sort(reverse=True)
-    result = [array[summarylist[0][1]][0], array[summarylist[0][1]][1], summarylist[0][3]]
+    result = [
+        array[summarylist[0][1]][0],
+        array[summarylist[0][1]][1],
+        summarylist[0][3],
+    ]
 
     delindex = result[2]
     counter = 0
@@ -70,14 +124,16 @@ def comparisonAlgorithm (array, input):
 
     return result
 
-def executeWorkflow (workflow):
+
+def executeWorkflow(workflow):
     try:
-        exec (workflow + "()")
+        exec(workflow + "()")
         return True
     except Exception as e:
         return e
 
-def cf_workflow (input):
+
+def cf_workflow(input):
     returnvalue = ""
 
     worklflowList = getWorkflowList()
@@ -89,13 +145,21 @@ def cf_workflow (input):
         if executionresult == True:
             returnvalue = [True, result[0], result[1], result[2], result[3]]
         else:
-            returnvalue = [False, executionresult, result[0], result[1], result[2], result[3]]
+            returnvalue = [
+                False,
+                executionresult,
+                result[0],
+                result[1],
+                result[2],
+                result[3],
+            ]
 
     else:
         returnvalue = [False, "No match found", ""]
 
     return returnvalue
 
-if __name__ == '__main__':
 
-    print (cf_workflow("offline"))
+if __name__ == "__main__":
+
+    print(cf_workflow("offline"))
