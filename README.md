@@ -22,13 +22,13 @@ GoogleAssistant2Windows, short GA2W, is an application which executes spoken com
 
 This project is still in a early development phase. Information on how to setup/install and use the program will come soon!
 
-### History
+#### History
 
 Once, I pre-programmed the application in AutoIt, a programming language from which I learned to program.
 But I want to improve my programming skills, knowledge and my GA2W application,
 so I decided to re-program the app in Python, make it better and more reliable.
 
-### Intention
+#### Intention
 
 This is my first big project. I am a beginner to programming, my study just started.
 I wanted to make my code public in order to share my idea. Feedback and help are welcome.
@@ -40,7 +40,7 @@ English is not my native language, so I am sorry about any spelling or grammar m
 
 ## Features
 
-TODO: to be defined.
+> TODO: to be defined.
 
 ## Getting started
 
@@ -50,7 +50,7 @@ Have a quick look if you are interested.
 - [Devlog video playlist](https://www.youtube.com/playlist?list=PL9IDggoskDpIRBojm6RpWjcMtCI8cIMZp) - German
 - [How to set up the program](https://youtu.be/fkwVXExyV48) - German, with english subtitles
 
-TODO: more to be defined.
+> TODO: more to be defined.
 
 ## Configuration
 
@@ -61,11 +61,11 @@ Expected libraries:
 - requests `pip install requests`
 - win32api `pip install pywin32`
 
-TODO: more to be defined.
+> TODO: more to be defined.
 
 ## Contributing
 
-TODO: to be defined.
+> TODO: to be defined.
 
 ##
 
