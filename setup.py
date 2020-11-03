@@ -26,26 +26,35 @@ print("")
 
 while 1:
     try:
-        update = requests.get("https://api.telegram.org/bot" + botToken + "/getUpdates")
-        request_json = update.json()
+        while 1:
+            update = requests.get("https://api.telegram.org/bot" + botToken + "/getUpdates")
+            request_json = update.json()
+            if request_json["ok"] == True:
+                if request_json["result"] != []:
+                    try:
+                        json_result = request_json["result"]
+                        content = json_result[-1]
+                        tempvar = content["channel_post"]
+                        break
+                    except Exception:
+                        pass
+
     except Exception:
         print("An Error occurred, please try again later")
 
     json_result = request_json["result"]
     content = json_result[-1]
     summary = []
-    summary.append(content["message"]["from"]["first_name"])  # Name
-    summary.append(content["message"]["text"])  # Text
-    summary.append(content["message"]["chat"]["id"])  # ChatId
+    summary.append(content["channel_post"]["text"])  # Text
+    summary.append(content["channel_post"]["chat"]["id"])  # ChatId
 
-    date_unix = content["message"]["date"]
+    date_unix = content["channel_post"]["date"]
     date = datetime.datetime.fromtimestamp(date_unix)
     summary.append(date)
 
     print("--- A message has been received. Please check if the results are correct: ---")
-    print(">> First name:", summary[0])
-    print(">> Text message:", summary[1])
-    print(">> Time: ", summary[3])
+    print(">> Text message:", summary[0])
+    print(">> Time: ", summary[2])
     print("")
 
     confirm_summary = input("Is this correct (y/n): ")
@@ -55,22 +64,24 @@ while 1:
         print("> Please send the message again.")
         print("")
 
-print("The Chat-ID is: " + str(summary[2]))
-writeChatID(str(summary[2]))
+print("The Chat-ID is: " + str(summary[1]))
+writeChatID(str(summary[1]))
 
 print("")
 
 language_list = ["DE", "EN"]
 
-language = input( "Currently the GA2W supports two languages (German, English). Please select one (DE/EN): ")
+language = input(
+    "Currently the GA2W supports two languages (German, English). Please select one (DE/EN): ")
 
 while 1:
 
     if language in language_list:
         print("> You chose '" + language + "' as you current language.")
-        os.rename( "data\\commandLibrary_" + language + ".json", "data\\commandLibrary.json")
+        os.rename("data\\commandLibrary_" + language +
+                  ".json", "data\\commandLibrary.json")
         os.rename("data\\interpreter\\splitwords_" + language + ".txt",
-            "data\\interpreter\\splitwords.txt",)
+                  "data\\interpreter\\splitwords.txt",)
         break
     else:
         language = input("Please enter a valid language code: ")
