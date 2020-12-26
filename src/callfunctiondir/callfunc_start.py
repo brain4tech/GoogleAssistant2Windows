@@ -1,35 +1,47 @@
-import json
-import os
 from pathlib import Path
-
+import os
 import win32api
+import json
 
 
-def getGlobalStartmenu():
-    winpath = os.environ["SYSTEMDRIVE"]
-    lnkpath = Path(winpath + "/ProgramData/Microsoft/Windows/Start Menu/Programs")
+def getGlobalStartmenu ():
 
-    pathlist_raw = list(lnkpath.glob("**/*.lnk"))
+    winpath = os.environ['SYSTEMDRIVE']
+    lnkpath = Path (winpath + "/ProgramData/Microsoft/Windows/Start Menu/Programs")
 
-    return pathlist_raw
-
-
-def getLocalStartmenu():
-    winpath2 = os.environ["APPDATA"]
-    lnkpath2 = Path(winpath2 + "/Microsoft/Windows/Start Menu/Programs")
-
-    pathlist_raw = list(lnkpath2.glob("**/*.lnk"))
+    pathlist_raw = list(lnkpath.glob('**/*.lnk'))
 
     return pathlist_raw
 
 
-def getOtherApps():
-    ppath = Path(__file__).parents[2]
-    path = Path(ppath / "data" / "callfuncfiles" / "start_additional-programs.txt")
-    file = open(path, "r", encoding="utf8")
+def getLocalStartmenu ():
+
+    winpath2 = os.environ['APPDATA']
+    lnkpath2 = Path (winpath2 + "/Microsoft/Windows/Start Menu/Programs")
+
+    pathlist_raw = list (lnkpath2.glob('**/*.lnk'))
+
+    return pathlist_raw
+
+
+def getOtherApps_Dir ():
+
+    ppath = Path (__file__).parents[2]
+    lnkpath3 = Path (ppath /'data'/'callfuncfiles'/'start_additional_programs')
+
+    pathlist_raw = list (lnkpath3.glob('**/*.lnk'))
+
+    return pathlist_raw
+
+
+def getOtherApps_File ():
+
+    ppath = Path (__file__).parents[2]
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_additional_programs.txt')
+    file = open(path, "r", encoding='utf8')
     read = file.read()
     otherApps_raw = json.loads(read)
-    otherApps = otherApps_raw["programs"]
+    otherApps = otherApps_raw['programs']
 
     for x in range(len(otherApps)):
         otherApps[x][0] = otherApps[x][0].lower()
@@ -37,25 +49,25 @@ def getOtherApps():
     return otherApps
 
 
-def mergePathlists(list1, list2):
-    for x in range(len(list2)):
+def mergePathlists (list1, list2):
+    for x in range (len(list2)):
         list1.append(list2[x])
 
     return list1
 
 
-def mergeStartwithAdd(list1, list2):
-    for x in range(len(list2)):
-        list1.append(list2[x])
+def mergeStartwithAdd (list1, list2):
+    for x in range (len(list2)):
+        list1.append (list2[x])
 
     return list1
 
 
-def optimizePathlist(rawpathlist):
+def optimizePathlist (rawpathlist):
     pathlist = []
     substrings = getBlacklistStrings()
 
-    for x in range(len(rawpathlist)):
+    for x in range (len(rawpathlist)):
         strpath_raw = rawpathlist[x]
         strpath = str(strpath_raw)
 
@@ -75,16 +87,16 @@ def optimizePathlist(rawpathlist):
     return pathlist
 
 
-def sortPathlist(pathlist):
+def sortPathlist (pathlist):
     pathlist.sort()
 
     return pathlist
 
 
-def getBlacklistStrings():
-    ppath = Path(__file__).parents[2]
-    path = Path(ppath / "data" / "callfuncfiles" / "start_blacklist-substrings.txt")
-    file = open(path, "r", encoding="utf8")
+def getBlacklistStrings ():
+    ppath = Path (__file__).parents[2]
+    path = Path (ppath / 'data' / 'callfuncfiles' / 'start_blacklist-substrings.txt')
+    file = open(path, "r", encoding='utf8')
     strings = file.readlines()
 
     for x in range(len(strings)):
@@ -93,7 +105,7 @@ def getBlacklistStrings():
     return strings
 
 
-""" #This is the first (older) comparison-algorithm. The second replaced the first one
+""" This is the first (older) comparison-algorithm. The second replaced the first one
 def comparisonAlgorithm1 (array, input):
 
     for x in range (len(array)):
@@ -105,8 +117,7 @@ def comparisonAlgorithm1 (array, input):
 
     return False    """
 
-
-def comparisonAlgorithm(array, input):
+def comparisonAlgorithm (array, input):
     input = input.split()
     summarylist = []
     targetsinInput = []
@@ -115,8 +126,8 @@ def comparisonAlgorithm(array, input):
         indexsplit = array[x][0].split()
         localcounter = 0
 
-        for y in range(len(input)):
-            for z in range(len(indexsplit)):
+        for y in range (len(input)):
+            for z in range (len(indexsplit)):
                 inputindex = input[y]
                 listindex = indexsplit[z]
 
@@ -126,20 +137,14 @@ def comparisonAlgorithm(array, input):
                     targetsinInput.append(y)
 
         if localcounter > 0:
-            summarylist.append(
-                [localcounter, x, array[x][0], targetsinInput]
-            )  # counter, index in array
+            summarylist.append([localcounter, x, array[x][0], targetsinInput]) #counter, index in array
             targetsinInput = []
 
     if summarylist == []:
         return False
 
     summarylist.sort(reverse=True)
-    result = [
-        array[summarylist[0][1]][0],
-        array[summarylist[0][1]][1],
-        summarylist[0][3],
-    ]
+    result = [array[summarylist[0][1]][0], array[summarylist[0][1]][1], summarylist[0][3]]
 
     delindex = result[2]
     counter = 0
@@ -158,81 +163,82 @@ def comparisonAlgorithm(array, input):
     return result
 
 
-def getPathlist():
-    # get programlist from global startmenu
+def getPathlist ():
+    #get programlist from global startmenu
     globalpathlist_raw = getGlobalStartmenu()
 
-    # get programlist from local startmenu
+    #get programlist from local startmenu
     localpathlist_raw = getLocalStartmenu()
 
-    # get additional apps from __file__
-    additional_raw = getOtherApps()
+    #get additional apps from __file__
+    #additional_raw = getOtherApps_File()
+    additional_raw = getOtherApps_Dir()
 
-    # merge lists
+    #merge lists
     pathlistStartmenu_raw = mergePathlists(globalpathlist_raw, localpathlist_raw)
 
-    # create optimized list1
+    #create optimized list1
     pathlistStartmenu = optimizePathlist(pathlistStartmenu_raw)
 
-    # merge startmenu and additional programs
-    pathlist = mergePathlists(pathlistStartmenu, additional_raw)
+    #optimize additional pathlist
+    pathlistAdditional = optimizePathlist(additional_raw)
 
-    # sort the list
+    #merge startmenu and additional programs
+    pathlist = mergePathlists (pathlistStartmenu, pathlistAdditional)
+
+    #sort the list
     pathlist_sorted = sortPathlist(pathlist)
 
     return pathlist_sorted
 
 
-def checkForProgram(input):
+def checkForProgram (input):
     input = str(input).lower()
-    if input == "":
+    if input == "" :
         return
 
     pathlist = getPathlist()
 
-    # check if input is in pathlist
+    #check if input is in pathlist
     result = comparisonAlgorithm(pathlist, input)
 
     if result != False:
-        print(
-            "MATCH! <" + input + "> has a match with:",
-            result[0] + ". Path to program:",
-            result[1],
-        )
+        print ("MATCH! <" +input + "> has a match with:", result[0] + ". Path to program:", result[1])
 
     else:
-        print("ERROR: No match found for <" + input + ">")
+        print ("ERROR: No match found for <" + input +">")
 
 
-def printPathlist(index=None):
+def printPathlist (index = None):
     array = getPathlist()
 
     if index != None:
         try:
-            print("Name:", array[index][0])
-            print("Path:", array[index][1])
+            print ("Name:", array[index][0])
+            print ("Path:", array[index][1])
 
         except Exception as e:
-            print("ERROR", e)
+            print ("ERROR", e)
 
     else:
         for x in range(len(array)):
-            print(array[x][0], "-->", array[x][1])
+            print (array[x][0],"-->", array[x][1])
 
 
-def cf_start(input=None):  # open a program or a file
+def cf_start (input=None):      #open a program or a file
+
     input = str(input).lower()
-    if input == "":
+    if input == "" :
         return
 
     pathlist = getPathlist()
 
-    # check if input is in pathlist
+    #check if input is in pathlist
     result = comparisonAlgorithm(pathlist, input)
     returnvalue = []
 
     if result != False:
-        shellreturn = win32api.ShellExecute(0, None, result[1], None, None, 1)
+        shellreturn = win32api.ShellExecute (0, None, result[1], None, None, 1)
         if shellreturn > 32:
             returnvalue = [True, result[0], result[1], result[2], result[3]]
         else:
@@ -243,6 +249,6 @@ def cf_start(input=None):  # open a program or a file
 
     return returnvalue
 
-
-if __name__ == "__main__":
-    checkForProgram("telegram")
+if __name__ == '__main__':
+    #print (cf_start("trello"))
+    #checkForProgram("musik")
