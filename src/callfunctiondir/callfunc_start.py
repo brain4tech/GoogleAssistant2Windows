@@ -252,3 +252,4 @@ def cf_start (input=None):      #open a program or a file
 if __name__ == '__main__':
     #print (cf_start("trello"))
     #checkForProgram("musik")
+    pass
