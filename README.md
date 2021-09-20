@@ -5,7 +5,6 @@
     <h2 align="center">Welcome to <code>GoogleAssistant2Windows</code> !</h2>
 </p>
 
-![license](https://img.shields.io/badge/license-MIT-green.svg?logo=spdx)
 ![contributors](https://img.shields.io/github/contributors/brain4tech/googleassistant2windows.svg?logo=github)
 ![repo size](https://img.shields.io/github/repo-size/brain4tech/googleassistant2windows.svg?logo=github)
 ![last commit](https://img.shields.io/github/last-commit/brain4tech/googleassistant2windows.svg?logo=github)
